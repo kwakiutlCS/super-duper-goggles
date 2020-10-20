@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.storage.entities;
+package me.ricardo.playground.ir.storage.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
