@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 
 public class ReminderTest {
 
-	private static final long TIMESTAMP = 1000L;
-
 	@Test
 	public void shouldHaveEmptyScheduleIfNoTime() {
 		// data

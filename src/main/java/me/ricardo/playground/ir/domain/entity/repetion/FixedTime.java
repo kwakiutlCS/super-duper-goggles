@@ -1,13 +1,16 @@
-package me.ricardo.playground.ir.domain.entity;
+package me.ricardo.playground.ir.domain.entity.repetion;
 
 import java.util.stream.Stream;
+
+import me.ricardo.playground.ir.domain.entity.Time;
+import me.ricardo.playground.ir.utils.Utils;
 
 public class FixedTime implements Time {
 
 	private long time;
 	
 	public FixedTime(long time) {
-		this.time = time;
+		this.time = Utils.truncateToMinute(time);
 	}
 	
 	@Override
