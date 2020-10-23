@@ -13,7 +13,9 @@ import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.api.entity.ReminderDto;
+import me.ricardo.playground.ir.api.entity.TimeDto;
+import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.mocks.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.service.ReminderService;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
@@ -62,23 +64,23 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldCreateReminder() {
 		// data
-		Reminder reminder = new Reminder("content");
+		ReminderDto reminder = new ReminderDto("content");
 		
 		// action
 		Response result = resource.createReminder(reminder);
 		
 		// verification
-		assertEquals(reminder.getContent(), ((Reminder) result.getEntity()).getContent());
-		assertEquals(3, ((Reminder) result.getEntity()).getId());
+		assertEquals(reminder.getContent(), ((ReminderDto) result.getEntity()).getContent());
+		assertEquals(3, ((ReminderDto) result.getEntity()).getId());
 	}
 	
 	@Test
 	public void shouldUpdateReminder() {
 		// data
-		Reminder reminder = new Reminder("updated");
+		ReminderDto reminder = new ReminderDto("updated");
 		
 		// action
-		Reminder result = resource.updateReminder(1, reminder);
+		ReminderDto result = resource.updateReminder(1, reminder);
 		
 		// verification
 		assertEquals(reminder.getContent(), result.getContent());
@@ -88,7 +90,7 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldThrowNotFoundForUpdateInexistentReminder() {
 		// data
-		Reminder reminder = new Reminder("updated");
+		ReminderDto reminder = new ReminderDto("updated");
 		
 		// verification
 		assertThrows(NotFoundException.class, () -> resource.updateReminder(999, reminder));
@@ -106,5 +108,18 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldThrowExceptionDeleteNonExistentReminder() {
 		assertThrows(NotFoundException.class, () -> resource.deleteReminder(999));
+	}
+	
+	@Test
+	public void shouldCreateTimeReminder() {
+		// data
+		ReminderDto reminder = new ReminderDto("content");
+		reminder.setTime(new TimeDto(60L));
+		
+		// action
+		Response result = resource.createReminder(reminder);
+		
+		// verification
+		assertEquals(60L, ((ReminderDto) result.getEntity()).getTime().getValue());
 	}
 }

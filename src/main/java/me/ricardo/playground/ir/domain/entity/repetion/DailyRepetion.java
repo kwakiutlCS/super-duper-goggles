@@ -7,10 +7,9 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
-import me.ricardo.playground.ir.domain.entity.Time;
 import me.ricardo.playground.ir.utils.Utils;
 
-public class DailyRepetion implements Time {
+public final class DailyRepetion implements Time {
 
 	private static final long DAY = 86400;
 	
@@ -46,7 +45,7 @@ public class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
-		ZonedDateTime lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
+		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
 		if (offset > start) {
 			long steps = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
@@ -73,7 +72,7 @@ public class DailyRepetion implements Time {
 			return schedule.limit(bound.getLimit());
 			
 		case TIMESTAMP_BOUND:
-			ZonedDateTime timeBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(bound.getTimestamp()), zone);
+			var timeBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(bound.getTimestamp()), zone);
 			return schedule.takeWhile(v -> !v.isAfter(timeBound));
 			
 		case NO_BOUND:

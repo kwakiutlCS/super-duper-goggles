@@ -1,10 +1,8 @@
-package me.ricardo.playground.ir.domain.entity;
+package me.ricardo.playground.ir.api.entity;
 
-import java.util.stream.Stream;
+import javax.json.bind.annotation.JsonbCreator;
 
-import me.ricardo.playground.ir.domain.entity.repetion.Time;
-
-public class Reminder {
+public class ReminderDto {
 
 	private Long id;
 	
@@ -14,9 +12,10 @@ public class Reminder {
 	
 	private Long updatedAt;
 	
-	private Time time;
+	private TimeDto time;
 	
-	public Reminder(String content) {
+	@JsonbCreator
+	public ReminderDto(String content) {
 		this.content = content;
 	}
 	
@@ -48,19 +47,11 @@ public class Reminder {
 		this.updatedAt = updatedAt;
 	}
 	
-	public Time getTime() {
+	public TimeDto getTime() {
 		return time;
 	}
 	
-	public void setTime(Time time) {
+	public void setTime(TimeDto time) {
 		this.time = time;
-	}
-
-	public Stream<Long> schedule() {
-		return time == null ? Stream.empty() : time.schedule();
-	}
-	
-	public Stream<Long> schedule(long start) {
-		return time == null ? Stream.empty() : time.schedule(start);
 	}
 }

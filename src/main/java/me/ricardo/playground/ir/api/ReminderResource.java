@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.api;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -16,7 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.api.adapter.ReminderAdapter;
+import me.ricardo.playground.ir.api.entity.ReminderDto;
 import me.ricardo.playground.ir.domain.service.ReminderService;
 
 @Path("/reminders")
@@ -32,20 +34,23 @@ public class ReminderResource {
 	}
 	
     @GET
-    public List<Reminder> getReminders() {
-        return service.getReminders();
+    public List<ReminderDto> getReminders() {
+        return service.getReminders()
+        		      .stream()
+        		      .map(ReminderAdapter::fromService)
+        		      .collect(Collectors.toList());
     }
     
     @GET
     @Path("/{id}")
-    public Reminder getReminder(@PathParam("id") long id) {
-    	return service.getReminder(id);
+    public ReminderDto getReminder(@PathParam("id") long id) {
+    	return ReminderAdapter.fromService(service.getReminder(id));
     }
     
     @POST
     @Transactional
-    public Response createReminder(Reminder reminder) {
-    	Reminder result = service.createReminder(reminder);
+    public Response createReminder(ReminderDto reminder) {
+    	ReminderDto result = ReminderAdapter.fromService(service.createReminder(ReminderAdapter.toService(reminder)));
     	
     	return Response.created(UriBuilder.fromResource(ReminderResource.class).path("/{id}").build(result.getId()))
     			       .entity(result)
@@ -55,8 +60,8 @@ public class ReminderResource {
     @PUT
     @Transactional
     @Path("/{id}")
-	public Reminder updateReminder(@PathParam("id") long id, Reminder reminder) {
-		return service.updateReminder(id, reminder);
+	public ReminderDto updateReminder(@PathParam("id") long id, ReminderDto reminder) {
+		return ReminderAdapter.fromService(service.updateReminder(id, ReminderAdapter.toService(reminder)));
 	}
 
     @DELETE
