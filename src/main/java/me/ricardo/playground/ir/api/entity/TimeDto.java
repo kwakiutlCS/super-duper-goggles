@@ -14,6 +14,8 @@ public class TimeDto {
 	private ChronoUnit unit;
 	
 	private String zone;
+	
+	private BoundDto bound;
 
 	public long getValue() {
 		return value;
@@ -45,5 +47,13 @@ public class TimeDto {
 
 	public void setZone(String zone) {
 		this.zone = zone;
+	}
+
+	public BoundDto getBound() {
+		return bound;
+	}
+	
+	public void setBound(BoundDto bound) {
+		this.bound = bound;
 	}
 }

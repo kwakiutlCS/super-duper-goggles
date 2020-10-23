@@ -16,4 +16,8 @@ public class TimeEntity extends PanacheEntity {
 	public ChronoUnit unit;
 	
 	public String zone;
+	
+	public Integer boundType;
+	
+	public Long boundValue;
 }

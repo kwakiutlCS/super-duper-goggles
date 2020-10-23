@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import me.ricardo.playground.ir.api.entity.BoundDto;
 import me.ricardo.playground.ir.api.entity.ReminderDto;
 import me.ricardo.playground.ir.api.entity.TimeDto;
 import me.ricardo.playground.ir.domain.mocks.ReminderRepositoryFake;
@@ -132,13 +133,18 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldCreateDailyRepetionTimeReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto();
-		reminder.setContent("content");
+		BoundDto bound = new BoundDto();
+		bound.setLimit(3L);
+
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
 		time.setStep(1);
 		time.setUnit(ChronoUnit.DAYS);
 		time.setZone("UTC");
+		time.setBound(bound);
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		reminder.setTime(time);
 		
 		// action
@@ -148,5 +154,6 @@ public class ReminderResourceTest {
 		assertEquals(1, ((ReminderDto) result.getEntity()).getTime().getStep());
 		assertEquals(ChronoUnit.DAYS, ((ReminderDto) result.getEntity()).getTime().getUnit());
 		assertEquals("UTC", ((ReminderDto) result.getEntity()).getTime().getZone());
+		assertEquals(3, ((ReminderDto) result.getEntity()).getTime().getBound().getLimit());
 	}
 }

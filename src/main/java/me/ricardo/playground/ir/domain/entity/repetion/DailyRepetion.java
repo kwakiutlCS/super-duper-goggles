@@ -47,6 +47,10 @@ public final class DailyRepetion implements Time {
 	public ZoneId getZone() {
 		return zone;
 	}
+
+	public Bound getBound() {
+		return bound;
+	}
 	
 	@Override
 	public Stream<Long> schedule() {

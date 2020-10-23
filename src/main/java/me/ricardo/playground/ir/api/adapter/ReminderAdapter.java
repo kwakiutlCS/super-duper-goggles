@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
+import me.ricardo.playground.ir.api.entity.BoundDto;
 import me.ricardo.playground.ir.api.entity.ReminderDto;
 import me.ricardo.playground.ir.api.entity.TimeDto;
 import me.ricardo.playground.ir.domain.entity.Reminder;
@@ -31,8 +32,24 @@ public class ReminderAdapter {
 			return new FixedTime(dto.getValue());
 		} else {
 			ZoneId zone = dto.getZone() == null ? ZoneOffset.UTC : ZoneId.of(dto.getZone());
-			return new DailyRepetion(dto.getValue(), dto.getStep(), Bound.none(), zone);
+			return new DailyRepetion(dto.getValue(), dto.getStep(), toService(dto.getBound()), zone);
 		}
+	}
+	
+	private static Bound toService(BoundDto dto) {
+		if (dto == null) {
+			return Bound.none();
+		}
+		
+		if (dto.getLimit() != null) {
+			return Bound.count(dto.getLimit());
+		}
+		
+		if (dto.getTimestamp() != null) {
+			return Bound.timestamp(dto.getTimestamp());
+		}
+
+		return Bound.none();
 	}
 	
 	public static ReminderDto fromService(Reminder reminder) {
@@ -62,6 +79,27 @@ public class ReminderAdapter {
 			dto.setUnit(ChronoUnit.DAYS);
 			dto.setStep(d.getStep());
 			dto.setZone(d.getZone().getId());
+			dto.setBound(fromService(d.getBound()));
+		}
+		
+		return dto;
+	}
+	
+	public static BoundDto fromService(Bound bound) {
+		BoundDto dto = new BoundDto();
+		
+		switch (bound.getType()) {
+		case COUNT_BOUND:
+			dto.setLimit(bound.getLimit());
+			break;
+			
+		case NO_BOUND:
+			dto = null;
+			break;
+			
+		case TIMESTAMP_BOUND:
+			dto.setTimestamp(bound.getTimestamp());
+			break;
 		}
 		
 		return dto;

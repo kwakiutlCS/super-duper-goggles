@@ -2,13 +2,13 @@ package me.ricardo.playground.ir.domain.entity.repetion;
 
 public class Bound {
 
-	enum BoundType {
+	public enum BoundType {
 		NO_BOUND, COUNT_BOUND, TIMESTAMP_BOUND;
 	}
 	
 	private BoundType type;
 	
-	private int limit;
+	private long limit;
 	
 	private long timestamp;
 	
@@ -27,14 +27,14 @@ public class Bound {
 		return bound;
 	}
 	
-	public static Bound count(int limit) {
+	public static Bound count(long limit) {
 		Bound bound = new Bound(BoundType.COUNT_BOUND);
 		bound.limit = limit;
 		
 		return bound;
 	}
 	
-	public int getLimit() {
+	public long getLimit() {
 		return limit;
 	}
 	
