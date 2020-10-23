@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -43,13 +45,13 @@ public class ReminderResource {
     
     @GET
     @Path("/{id}")
-    public ReminderDto getReminder(@PathParam("id") long id) {
+    public ReminderDto getReminder(@Min(1) @PathParam("id") long id) {
     	return ReminderAdapter.fromService(service.getReminder(id));
     }
     
     @POST
     @Transactional
-    public Response createReminder(ReminderDto reminder) {
+    public Response createReminder(@Valid ReminderDto reminder) {
     	ReminderDto result = ReminderAdapter.fromService(service.createReminder(ReminderAdapter.toService(reminder)));
     	
     	return Response.created(UriBuilder.fromResource(ReminderResource.class).path("/{id}").build(result.getId()))

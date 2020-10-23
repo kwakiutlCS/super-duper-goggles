@@ -23,7 +23,7 @@ public class ReminderService {
 		this.reminderRepository = reminderRepository;
 		this.clock = clock;
 	}
-	
+
 	public Reminder createReminder(Reminder reminder) {
 		long timestamp = clock.instant().getEpochSecond();
 		reminder.setCreatedAt(timestamp);

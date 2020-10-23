@@ -1,6 +1,6 @@
 package me.ricardo.playground.ir.api.entity;
 
-import javax.json.bind.annotation.JsonbCreator;
+import javax.validation.Valid;
 
 public class ReminderDto {
 
@@ -12,12 +12,8 @@ public class ReminderDto {
 	
 	private Long updatedAt;
 	
+	@Valid
 	private TimeDto time;
-	
-	@JsonbCreator
-	public ReminderDto(String content) {
-		this.content = content;
-	}
 	
 	public Long getId() {
 		return id;
@@ -25,6 +21,10 @@ public class ReminderDto {
 
 	public String getContent() {
 		return content;
+	}
+	
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public void setId(long id) {

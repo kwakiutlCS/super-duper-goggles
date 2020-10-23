@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.api.entity.ReminderDto;
 import me.ricardo.playground.ir.api.entity.TimeDto;
-import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.mocks.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.service.ReminderService;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
@@ -65,7 +64,8 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldCreateReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto("content");
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		
 		// action
 		Response result = resource.createReminder(reminder);
@@ -78,7 +78,8 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldUpdateReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto("updated");
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		
 		// action
 		ReminderDto result = resource.updateReminder(1, reminder);
@@ -91,7 +92,8 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldThrowNotFoundForUpdateInexistentReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto("updated");
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		
 		// verification
 		assertThrows(NotFoundException.class, () -> resource.updateReminder(999, reminder));
@@ -114,7 +116,8 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldCreateFixedTimeReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto("content");
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
 		reminder.setTime(time);
@@ -129,13 +132,14 @@ public class ReminderResourceTest {
 	@Test
 	public void shouldCreateDailyRepetionTimeReminder() {
 		// data
-		ReminderDto reminder = new ReminderDto("content");
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
 		time.setStep(1);
 		time.setUnit(ChronoUnit.DAYS);
+		time.setZone("UTC");
 		reminder.setTime(time);
-		
 		
 		// action
 		Response result = resource.createReminder(reminder);
@@ -143,5 +147,6 @@ public class ReminderResourceTest {
 		// verification
 		assertEquals(1, ((ReminderDto) result.getEntity()).getTime().getStep());
 		assertEquals(ChronoUnit.DAYS, ((ReminderDto) result.getEntity()).getTime().getUnit());
+		assertEquals("UTC", ((ReminderDto) result.getEntity()).getTime().getZone());
 	}
 }

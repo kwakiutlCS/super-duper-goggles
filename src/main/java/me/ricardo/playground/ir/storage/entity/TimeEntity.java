@@ -14,4 +14,6 @@ public class TimeEntity extends PanacheEntity {
 	public Integer step;
 	
 	public ChronoUnit unit;
+	
+	public String zone;
 }

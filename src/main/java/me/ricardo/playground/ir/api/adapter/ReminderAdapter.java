@@ -1,5 +1,6 @@
 package me.ricardo.playground.ir.api.adapter;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
@@ -29,12 +30,14 @@ public class ReminderAdapter {
 		if (dto.getUnit() == null) {
 			return new FixedTime(dto.getValue());
 		} else {
-			return new DailyRepetion(dto.getValue(), dto.getStep(), Bound.none(), ZoneOffset.UTC);
+			ZoneId zone = dto.getZone() == null ? ZoneOffset.UTC : ZoneId.of(dto.getZone());
+			return new DailyRepetion(dto.getValue(), dto.getStep(), Bound.none(), zone);
 		}
 	}
 	
 	public static ReminderDto fromService(Reminder reminder) {
-		ReminderDto dto = new ReminderDto(reminder.getContent());
+		ReminderDto dto = new ReminderDto();
+		dto.setContent(reminder.getContent());
 		
 		dto.setId(reminder.getId());
 		dto.setCreatedAt(reminder.getCreatedAt());
@@ -58,6 +61,7 @@ public class ReminderAdapter {
 			dto.setValue(d.getStart());
 			dto.setUnit(ChronoUnit.DAYS);
 			dto.setStep(d.getStep());
+			dto.setZone(d.getZone().getId());
 		}
 		
 		return dto;

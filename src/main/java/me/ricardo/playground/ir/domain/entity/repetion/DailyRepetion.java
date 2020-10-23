@@ -43,6 +43,10 @@ public final class DailyRepetion implements Time {
 	public int getStep() {
 		return step;
 	}
+
+	public ZoneId getZone() {
+		return zone;
+	}
 	
 	@Override
 	public Stream<Long> schedule() {
