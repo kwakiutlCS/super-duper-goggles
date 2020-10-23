@@ -18,6 +18,6 @@ public class ReminderEntity extends PanacheEntity {
 	@Column(nullable = false)
 	public long updatedAt;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	public TimeEntity time;
 }

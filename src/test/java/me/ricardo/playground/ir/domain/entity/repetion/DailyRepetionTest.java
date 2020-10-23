@@ -140,6 +140,18 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
+	public void shouldScheduleInDaySavingsChanges2() {
+		// data
+		Reminder reminder = new Reminder("content");
+		reminder.setTime(new DailyRepetion(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon")));
+		
+		// verification
+		assertEquals(1585281600, reminder.schedule(1585281600L).limit(3).collect(Collectors.toList()).get(0));
+		assertEquals(1585281600+DAY, reminder.schedule(1585281600L).limit(3).collect(Collectors.toList()).get(1));
+		assertEquals(1585278000+2*DAY, reminder.schedule(1585281600L).limit(3).collect(Collectors.toList()).get(2));
+	}
+	
+	@Test
 	public void shouldTruncateTimeToMinute() {
 		// data
 		Reminder reminder = new Reminder("content");
@@ -166,5 +178,25 @@ public class DailyRepetionTest {
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.schedule().limit(3).collect(Collectors.toList()));
+	}
+	
+	@Test
+	public void shouldBoundScheduleByCount2() {
+		// data
+		Reminder reminder = new Reminder("content");
+		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC));
+		
+		// verification
+		assertEquals(List.of(TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY+1).limit(10).collect(Collectors.toList()));
+	}
+	
+	@Test
+	public void shouldBoundScheduleByCount3() {
+		// data
+		Reminder reminder = new Reminder("content");
+		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC));
+		
+		// verification
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY).limit(10).collect(Collectors.toList()));
 	}
 }

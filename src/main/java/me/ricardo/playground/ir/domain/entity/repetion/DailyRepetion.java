@@ -11,8 +11,6 @@ import me.ricardo.playground.ir.utils.Utils;
 
 public final class DailyRepetion implements Time {
 
-	private static final long DAY = 86400;
-	
 	private long start;
 	
 	private Bound bound;
@@ -38,6 +36,14 @@ public final class DailyRepetion implements Time {
 		this.minute = Utils.parseMinute(this.start, zone);
 	}
 
+	public long getStart() {
+		return start;
+	}
+	
+	public int getStep() {
+		return step;
+	}
+	
 	@Override
 	public Stream<Long> schedule() {
 		return schedule(start);
@@ -45,39 +51,54 @@ public final class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
+		Stream<ZonedDateTime> schedule;
+		
+		switch (bound.getType()) {
+		case COUNT_BOUND:
+			schedule = countBoundSchedule(offset);
+			break;
+			
+		case TIMESTAMP_BOUND:
+			var timeBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(bound.getTimestamp()), zone);
+			schedule = noBoundSchedule(offset).takeWhile(v -> !v.isAfter(timeBound));
+			break;
+			
+		case NO_BOUND:
+		default:
+			schedule = noBoundSchedule(offset);
+			break;
+		}
+		
+		return schedule.map(ZonedDateTime::toEpochSecond);
+	}
+	
+	private Stream<ZonedDateTime> noBoundSchedule(long offset) {
 		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
 		if (offset > start) {
-			long steps = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
+			long iterations = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
 			
-			if (offset > start + steps * step * DAY) {
-				steps++;
+			if (offset > start + iterations * step * ChronoUnit.DAYS.getDuration().getSeconds()) {
+				iterations++;
 			}
 			
 		    lowerBound = lowerBound.truncatedTo(ChronoUnit.DAYS)
-		    					   .plusDays(steps * step)
+		    					   .plusDays(iterations * step)
 		    					   .withHour(hour)
 		    					   .withMinute(minute);
 		}
 		
-		return boundSchedule(Stream.iterate(lowerBound, v -> v.plusDays(step))
-			     	               .map(v -> v.withHour(hour)))
-			       .map(ZonedDateTime::toEpochSecond);
+		return Stream.iterate(lowerBound, v -> v.plusDays(step))
+			     	 .map(v -> v.withHour(hour));
 	}
 	
-	private Stream<ZonedDateTime> boundSchedule(Stream<ZonedDateTime> schedule) {
-		switch (bound.getType()) {
+	private Stream<ZonedDateTime> countBoundSchedule(long offset) {
+		var startTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
+		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(offset), zone);
 		
-		case COUNT_BOUND:
-			return schedule.limit(bound.getLimit());
-			
-		case TIMESTAMP_BOUND:
-			var timeBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(bound.getTimestamp()), zone);
-			return schedule.takeWhile(v -> !v.isAfter(timeBound));
-			
-		case NO_BOUND:
-		default:
-			return schedule;
-		}
+		return Stream.iterate(startTime, v -> v.plusDays(step))
+			     	 .map(v -> v.withHour(hour))
+			     	 .limit(bound.getLimit())
+			     	 .dropWhile(v -> v.isBefore(lowerBound));
 	}
 }

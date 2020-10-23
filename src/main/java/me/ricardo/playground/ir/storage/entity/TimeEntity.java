@@ -1,5 +1,7 @@
 package me.ricardo.playground.ir.storage.entity;
 
+import java.time.temporal.ChronoUnit;
+
 import javax.persistence.Entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -7,5 +9,9 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 @Entity(name = "Time")
 public class TimeEntity extends PanacheEntity {
 
-	public Long time;
+	public long time;
+	
+	public Integer step;
+	
+	public ChronoUnit unit;
 }

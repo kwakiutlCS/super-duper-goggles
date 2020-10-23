@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
@@ -111,15 +112,36 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldCreateTimeReminder() {
+	public void shouldCreateFixedTimeReminder() {
 		// data
 		ReminderDto reminder = new ReminderDto("content");
-		reminder.setTime(new TimeDto(60L));
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		reminder.setTime(time);
 		
 		// action
 		Response result = resource.createReminder(reminder);
 		
 		// verification
 		assertEquals(60L, ((ReminderDto) result.getEntity()).getTime().getValue());
+	}
+	
+	@Test
+	public void shouldCreateDailyRepetionTimeReminder() {
+		// data
+		ReminderDto reminder = new ReminderDto("content");
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit(ChronoUnit.DAYS);
+		reminder.setTime(time);
+		
+		
+		// action
+		Response result = resource.createReminder(reminder);
+		
+		// verification
+		assertEquals(1, ((ReminderDto) result.getEntity()).getTime().getStep());
+		assertEquals(ChronoUnit.DAYS, ((ReminderDto) result.getEntity()).getTime().getUnit());
 	}
 }

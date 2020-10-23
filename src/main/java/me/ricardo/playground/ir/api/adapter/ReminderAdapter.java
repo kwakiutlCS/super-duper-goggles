@@ -1,8 +1,13 @@
 package me.ricardo.playground.ir.api.adapter;
 
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+
 import me.ricardo.playground.ir.api.entity.ReminderDto;
 import me.ricardo.playground.ir.api.entity.TimeDto;
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 
@@ -16,12 +21,16 @@ public class ReminderAdapter {
 		return reminder;
 	}
 	
-	private static FixedTime toService(TimeDto dto) {
+	private static Time toService(TimeDto dto) {
 		if (dto == null) {
 			return null;
 		}
 		
-		return new FixedTime(dto.getValue());
+		if (dto.getUnit() == null) {
+			return new FixedTime(dto.getValue());
+		} else {
+			return new DailyRepetion(dto.getValue(), dto.getStep(), Bound.none(), ZoneOffset.UTC);
+		}
 	}
 	
 	public static ReminderDto fromService(Reminder reminder) {
@@ -40,6 +49,17 @@ public class ReminderAdapter {
 			return null;
 		}
 		
-		return new TimeDto(((FixedTime) time).getTime());
+		TimeDto dto = new TimeDto();
+		
+		if (time instanceof FixedTime f) {
+			dto.setValue(f.getTime());
+			
+		} else if (time instanceof DailyRepetion d) {
+			dto.setValue(d.getStart());
+			dto.setUnit(ChronoUnit.DAYS);
+			dto.setStep(d.getStep());
+		}
+		
+		return dto;
 	}
 }

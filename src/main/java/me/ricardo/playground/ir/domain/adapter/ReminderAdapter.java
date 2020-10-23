@@ -1,6 +1,11 @@
 package me.ricardo.playground.ir.domain.adapter;
 
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
@@ -36,6 +41,10 @@ public class ReminderAdapter {
 		
 		if (time instanceof FixedTime f) {
 			entity.time = f.getTime();
+		} else if (time instanceof DailyRepetion d) {
+			entity.time = d.getStart();
+			entity.unit = ChronoUnit.DAYS;
+			entity.step = d.getStep();
 		}
 		
 		return entity;
@@ -52,10 +61,14 @@ public class ReminderAdapter {
 	}
 
 	private static Time fromStorage(TimeEntity entity) {
-		if (entity != null) {
+		if (entity == null) {
+			return null;
+		}
+		
+		if (entity.unit == null) {
 			return new FixedTime(entity.time);
 		}
 		
-		return null;
+		return new DailyRepetion(entity.time, entity.step, Bound.none(), ZoneOffset.UTC);
 	}
 }
