@@ -51,32 +51,11 @@ public final class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
-		Stream<ZonedDateTime> schedule;
-		
-		switch (bound.getType()) {
-		case COUNT_BOUND:
-			schedule = countBoundSchedule(offset);
-			break;
-			
-		case TIMESTAMP_BOUND:
-			var timeBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(bound.getTimestamp()), zone);
-			schedule = noBoundSchedule(offset).takeWhile(v -> !v.isAfter(timeBound));
-			break;
-			
-		case NO_BOUND:
-		default:
-			schedule = noBoundSchedule(offset);
-			break;
-		}
-		
-		return schedule.map(ZonedDateTime::toEpochSecond);
-	}
-	
-	private Stream<ZonedDateTime> noBoundSchedule(long offset) {
 		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
+		long iterations = 0;
 		
 		if (offset > start) {
-			long iterations = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
+			iterations = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
 			
 			if (offset > start + iterations * step * ChronoUnit.DAYS.getDuration().getSeconds()) {
 				iterations++;
@@ -88,17 +67,27 @@ public final class DailyRepetion implements Time {
 		    					   .withMinute(minute);
 		}
 		
-		return Stream.iterate(lowerBound, v -> v.plusDays(step))
-			     	 .map(v -> v.withHour(hour));
+		var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
+			     	 	     		.map(v -> v.withHour(hour))
+			     	 	     		.map(ZonedDateTime::toEpochSecond);
+		
+		return bound(noBoundSchedule, iterations);
 	}
 	
-	private Stream<ZonedDateTime> countBoundSchedule(long offset) {
-		var startTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
-		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(offset), zone);
-		
-		return Stream.iterate(startTime, v -> v.plusDays(step))
-			     	 .map(v -> v.withHour(hour))
-			     	 .limit(bound.getLimit())
-			     	 .dropWhile(v -> v.isBefore(lowerBound));
+	private Stream<Long> bound(Stream<Long> schedule, long iterations) {
+		switch (bound.getType()) {
+		case COUNT_BOUND:
+			if (iterations >= bound.getLimit()) {
+				return Stream.empty();
+			}
+			return schedule.limit(bound.getLimit() - iterations);
+			
+		case TIMESTAMP_BOUND:
+			return schedule.takeWhile(v -> v <= bound.getTimestamp());
+			
+		case NO_BOUND:
+		default:
+			return schedule;
+		}
 	}
 }
