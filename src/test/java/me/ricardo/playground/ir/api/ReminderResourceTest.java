@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
@@ -155,5 +156,28 @@ public class ReminderResourceTest {
 		assertEquals(ChronoUnit.DAYS, ((ReminderDto) result.getEntity()).getTime().getUnit());
 		assertEquals("UTC", ((ReminderDto) result.getEntity()).getTime().getZone());
 		assertEquals(3, ((ReminderDto) result.getEntity()).getTime().getBound().getLimit());
+	}
+	
+	@Test
+	public void shouldRetrieveReminderSchedule() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit(ChronoUnit.DAYS);
+		time.setZone("UTC");
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		long id = ((ReminderDto) resource.createReminder(reminder).getEntity()).getId();
+		
+		// action
+		List<Long> schedule = resource.getSchedule(id, 0, 200000L);
+		
+		// verification
+		assertEquals(60L, schedule.get(0));
+		assertEquals(86460L, schedule.get(1));
+		assertEquals(172860L, schedule.get(2));
 	}
 }

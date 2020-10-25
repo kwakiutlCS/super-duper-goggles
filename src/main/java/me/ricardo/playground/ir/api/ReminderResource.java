@@ -15,6 +15,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -72,5 +73,11 @@ public class ReminderResource {
 	public Response deleteReminder(@PathParam("id") long id) {
 		service.deleteReminder(id);
 		return Response.noContent().build();
+	}
+
+    @GET
+    @Path("/{id}/schedule")
+	public List<Long> getSchedule(@PathParam("id") long id, @QueryParam("start") long start, @QueryParam("end") long end) {
+		return service.getSchedule(id, start, end);
 	}
 }

@@ -65,4 +65,10 @@ public class ReminderService {
 			throw new NotFoundException();
 		}
 	}
+
+	public List<Long> getSchedule(long id, long start, long end) {
+		return getReminder(id).schedule(start)
+				              .takeWhile(s -> s < end)
+				              .collect(Collectors.toList());
+	}
 }
