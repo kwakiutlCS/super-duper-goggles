@@ -5,35 +5,43 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.stream.Stream;
 
 import me.ricardo.playground.ir.utils.Utils;
 
 public final class DailyRepetion implements Time {
 
-	private long start;
+	final private long start;
 	
-	private Bound bound;
+	final private Bound bound;
 	
-	private int hour;
+	final private int hour;
 	
-	private int minute;
+	final private int minute;
 	
-	private int step;
+	final private int step;
 	
-	private ZoneId zone;
+	final private ZoneId zone;
+	
+	final private List<Long> exceptions;
 	
 	public DailyRepetion(long start) {
 		this(start, 1, Bound.none(), ZoneOffset.UTC);
 	}
 	
 	public DailyRepetion(long start, int step, Bound bound, ZoneId zone) {
+		this(start, step, bound, zone, List.of());
+	}
+	
+	public DailyRepetion(long start, int step, Bound bound, ZoneId zone, List<Long> exceptions) {
 		this.start = Utils.truncateToMinute(start);
 		this.bound = bound;
 		this.step = step;
 		this.zone = zone;
 		this.hour = Utils.parseHour(this.start, zone);
 		this.minute = Utils.parseMinute(this.start, zone);
+		this.exceptions = exceptions;
 	}
 
 	public long getStart() {
@@ -50,6 +58,10 @@ public final class DailyRepetion implements Time {
 
 	public Bound getBound() {
 		return bound;
+	}
+	
+	public List<Long> getExceptions() {
+		return exceptions;
 	}
 	
 	@Override
@@ -79,16 +91,14 @@ public final class DailyRepetion implements Time {
 			     	 	     		.map(v -> v.withHour(hour))
 			     	 	     		.map(ZonedDateTime::toEpochSecond);
 		
-		return bound(noBoundSchedule, iterations);
+		return bound(noBoundSchedule, iterations)
+			       .filter(v -> !exceptions.contains(v));
 	}
 	
 	private Stream<Long> bound(Stream<Long> schedule, long iterations) {
 		switch (bound.getType()) {
 		case COUNT_BOUND:
-			if (iterations >= bound.getLimit()) {
-				return Stream.empty();
-			}
-			return schedule.limit(bound.getLimit() - iterations);
+			return schedule.limit(Math.max(0, bound.getLimit() - iterations));
 			
 		case TIMESTAMP_BOUND:
 			return schedule.takeWhile(v -> v <= bound.getTimestamp());

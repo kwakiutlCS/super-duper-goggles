@@ -48,6 +48,7 @@ public class ReminderAdapter {
 			entity.step = d.getStep();
 			entity.zone = d.getZone().getId();
 			entity.boundType = d.getBound().getType().ordinal();
+			entity.exceptions = d.getExceptions();
 			
 			if (d.getBound().getType() == BoundType.COUNT_BOUND) {
 				entity.boundValue = Long.valueOf(d.getBound().getLimit());
@@ -85,6 +86,6 @@ public class ReminderAdapter {
 			bound = Bound.timestamp(entity.boundValue);
 		}
 		
-		return new DailyRepetion(entity.time, entity.step, bound, ZoneId.of(entity.zone));
+		return new DailyRepetion(entity.time, entity.step, bound, ZoneId.of(entity.zone), entity.exceptions);
 	}
 }

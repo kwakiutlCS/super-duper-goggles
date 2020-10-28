@@ -166,6 +166,7 @@ public class ReminderResourceTest {
 		time.setStep(1);
 		time.setUnit(ChronoUnit.DAYS);
 		time.setZone("UTC");
+		time.setExceptions(List.of());
 		
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -179,5 +180,25 @@ public class ReminderResourceTest {
 		assertEquals(60L, schedule.get(0));
 		assertEquals(86460L, schedule.get(1));
 		assertEquals(172860L, schedule.get(2));
+	}
+	
+	@Test
+	public void shouldAddAndRetrieveExceptionsToDailyReminder() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit(ChronoUnit.DAYS);
+		time.setExceptions(List.of(60L + ChronoUnit.DAYS.getDuration().getSeconds()));
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		
+		// action
+		Response result = resource.createReminder(reminder);
+		
+		// verification
+		assertEquals(86460, ((ReminderDto) result.getEntity()).getTime().getExceptions().get(0));
 	}
 }

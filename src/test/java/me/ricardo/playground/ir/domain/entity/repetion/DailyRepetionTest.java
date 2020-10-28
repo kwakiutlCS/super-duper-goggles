@@ -199,4 +199,26 @@ public class DailyRepetionTest {
 		// verification
 		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY).limit(10).collect(Collectors.toList()));
 	}
+	
+	@Test
+	public void shouldAllowCancelSpecificIterationOfReminder() {
+		// data
+		Reminder reminder = new Reminder("content");
+		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, List.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		reminder.setTime(time);
+		
+		// verification
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));
+	}
+	
+	@Test
+	public void shouldAllowCancelSpecificIterationOfReminder2() {
+		// data
+		Reminder reminder = new Reminder("content");
+		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), List.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		reminder.setTime(time);
+		
+		// verification
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));
+	}
 }

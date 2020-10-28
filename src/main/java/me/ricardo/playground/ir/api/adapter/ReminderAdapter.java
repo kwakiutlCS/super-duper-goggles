@@ -32,7 +32,7 @@ public class ReminderAdapter {
 			return new FixedTime(dto.getValue());
 		} else {
 			ZoneId zone = dto.getZone() == null ? ZoneOffset.UTC : ZoneId.of(dto.getZone());
-			return new DailyRepetion(dto.getValue(), dto.getStep(), toService(dto.getBound()), zone);
+			return new DailyRepetion(dto.getValue(), dto.getStep(), toService(dto.getBound()), zone, dto.getExceptions());
 		}
 	}
 	
@@ -80,6 +80,7 @@ public class ReminderAdapter {
 			dto.setStep(d.getStep());
 			dto.setZone(d.getZone().getId());
 			dto.setBound(fromService(d.getBound()));
+			dto.setExceptions(d.getExceptions());
 		}
 		
 		return dto;

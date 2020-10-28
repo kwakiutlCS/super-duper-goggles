@@ -1,7 +1,10 @@
 package me.ricardo.playground.ir.storage.entity;
 
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -20,4 +23,8 @@ public class TimeEntity extends PanacheEntity {
 	public Integer boundType;
 	
 	public Long boundValue;
+	
+	@ElementCollection
+	@CollectionTable(name="Exception")
+	public List<Long> exceptions;
 }
