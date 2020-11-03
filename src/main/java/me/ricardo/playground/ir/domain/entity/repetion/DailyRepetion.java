@@ -71,29 +71,29 @@ public final class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
-		var lowerBound = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
-		long iterations = 0;
+		var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
-		if (offset > start) {
-			iterations = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
-			
-			if (offset > start + iterations * step * ChronoUnit.DAYS.getDuration().getSeconds()) {
-				iterations++;
-			}
-			
-		    lowerBound = lowerBound.truncatedTo(ChronoUnit.DAYS)
-		    					   .plusDays(iterations * step)
-		    					   .withHour(hour)
-		    					   .withMinute(minute);
-		}
+		var iterations = calculateNumberIterations(startDate, offset);
+		
+		var lowerBound = startDate.plusDays(iterations * step);
 		
 		var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
-			     	 	     		.map(v -> v.withHour(hour))
 			     	 	     		.map(ZonedDateTime::toEpochSecond);
 		
 		return bound(noBoundSchedule, iterations)
 			       .filter(v -> !exceptions.contains(v));
 	}
+	
+	
+	private long calculateNumberIterations(ZonedDateTime startDate, long offset) {
+		if (offset <= start) return 0;
+		
+		var fullIterations = ChronoUnit.DAYS.between(Instant.ofEpochSecond(start), Instant.ofEpochSecond(offset)) / step;
+		var partialIterations = offset > startDate.plusDays(fullIterations * step).toEpochSecond() ? 1 : 0;
+		
+		return fullIterations + partialIterations;
+	}
+	
 	
 	private Stream<Long> bound(Stream<Long> schedule, long iterations) {
 		switch (bound.getType()) {

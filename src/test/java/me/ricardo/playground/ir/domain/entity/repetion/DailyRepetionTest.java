@@ -152,6 +152,16 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
+	public void shouldScheduleInDaySavingsChanges3() {
+		// data
+		Reminder reminder = new Reminder("content");
+		reminder.setTime(new DailyRepetion(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon")));
+		
+		// verification
+		assertEquals(1603591320, reminder.schedule(1603591260).limit(3).collect(Collectors.toList()).get(0));
+	}
+	
+	@Test
 	public void shouldTruncateTimeToMinute() {
 		// data
 		Reminder reminder = new Reminder("content");
@@ -198,6 +208,16 @@ public class DailyRepetionTest {
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY).limit(10).collect(Collectors.toList()));
+	}
+	
+	@Test
+	public void shouldBoundScheduleByCount4() {
+		// data
+		Reminder reminder = new Reminder("content");
+		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC));
+		
+		// verification
+		assertEquals(List.of(), reminder.schedule(TIMESTAMP+7*DAY).limit(10).collect(Collectors.toList()));
 	}
 	
 	@Test
