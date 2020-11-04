@@ -1,11 +1,14 @@
 package me.ricardo.playground.ir.api;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -39,7 +42,7 @@ public class ReminderResource {
 	
     @GET
     public List<ReminderDto> getReminders(@NotNull @HeaderParam("user") String user) {
-        return service.getReminders()
+        return service.getReminders(user)
         		      .stream()
         		      .map(ReminderAdapter::fromService)
         		      .collect(Collectors.toList());
@@ -48,7 +51,7 @@ public class ReminderResource {
     @GET
     @Path("/{id}")
     public ReminderDto getReminder(@NotNull @HeaderParam("user") String user, @PathParam("id") long id) {
-    	return ReminderAdapter.fromService(service.getReminder(id));
+    	return ReminderAdapter.fromService(service.getReminder(id, user));
     }
     
     @POST
@@ -65,21 +68,29 @@ public class ReminderResource {
     @PUT
     @Transactional
     @Path("/{id}")
-	public ReminderDto updateReminder(@PathParam("id") long id, ReminderDto reminder) {
-		return ReminderAdapter.fromService(service.updateReminder(id, ReminderAdapter.toService(reminder)));
+	public ReminderDto updateReminder(@NotNull @HeaderParam("user") String user, @PathParam("id") long id, @Valid ReminderDto reminder) {
+    	reminder.setUser(user);
+		return ReminderAdapter.fromService(service.updateReminder(id, user, ReminderAdapter.toService(reminder)));
 	}
 
     @DELETE
     @Transactional
     @Path("/{id}")
-	public Response deleteReminder(@PathParam("id") long id) {
-		service.deleteReminder(id);
+	public Response deleteReminder(@NotNull @HeaderParam("user") String user, @PathParam("id") long id) {
+		service.deleteReminder(id, user);
 		return Response.noContent().build();
 	}
 
     @GET
     @Path("/{id}/schedule")
-	public List<Long> getSchedule(@PathParam("id") long id, @QueryParam("start") long start, @QueryParam("end") long end) {
-		return service.getSchedule(id, start, end);
+	public List<Long> getSchedule(@NotNull @HeaderParam("user") String user,
+			                      @PathParam("id") long id,
+			                      @NotNull @Min(0) @QueryParam("start") Long start,
+			                      @NotNull @Min(1) @QueryParam("end") Long end) {
+    	if (end <= start) {
+    		throw new ConstraintViolationException(Set.of());
+    	}
+    	
+		return service.getSchedule(id, user, start, end);
 	}
 }

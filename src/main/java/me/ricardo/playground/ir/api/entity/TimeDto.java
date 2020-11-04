@@ -1,25 +1,33 @@
 package me.ricardo.playground.ir.api.entity;
 
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Set;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import me.ricardo.playground.ir.api.validator.Bound;
+import me.ricardo.playground.ir.api.validator.Unit;
+import me.ricardo.playground.ir.api.validator.Zone;
 
 public class TimeDto {
 
-	@Min(0)
-	private long value;
+	@NotNull @Min(0)
+	private Long value;
 	
+	@Min(1)
 	private Integer step;
 	
-	private ChronoUnit unit;
+	@Unit
+	private String unit;
 	
+	@Zone
 	private String zone;
 	
+	@Valid @Bound
 	private BoundDto bound;
 	
-	private Set<Long> exceptions;
+	private Set<@Min(0) Long> exceptions;
 
 	public long getValue() {
 		return value;
@@ -37,11 +45,11 @@ public class TimeDto {
 		this.step = step;
 	}
 
-	public ChronoUnit getUnit() {
+	public String getUnit() {
 		return unit;
 	}
 
-	public void setUnit(ChronoUnit unit) {
+	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 
@@ -67,5 +75,11 @@ public class TimeDto {
 	
 	public void setExceptions(Set<Long> exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	@Override
+	public String toString() {
+		return "Time [value=" + value + ", step=" + step + ", unit=" + unit + ", zone=" + zone + ", bound=" + bound
+				+ ", exceptions=" + exceptions + "]";
 	}
 }

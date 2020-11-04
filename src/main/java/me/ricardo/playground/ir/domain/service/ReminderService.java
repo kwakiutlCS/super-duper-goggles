@@ -32,40 +32,42 @@ public class ReminderService {
 		return ReminderAdapter.fromStorage(entity);
 	}
 
-	public List<Reminder> getReminders() {
-		return reminderRepository.listAll()
+	public List<Reminder> getReminders(String user) {
+		return reminderRepository.findByUser(user)
 				                 .stream()
-								 .map(ReminderAdapter::fromStorage)
+				                 .map(ReminderAdapter::fromStorage)
 								 .collect(Collectors.toList());
 	}
 
-	public Reminder getReminder(long id) {
+	public Reminder getReminder(long id, String user) {
 		return reminderRepository.findByIdOptional(id)
+								 .filter(r -> user.equals(r.userId))
 				                 .map(ReminderAdapter::fromStorage)
-				                 .orElseThrow(() -> new NotFoundException());
+				                 .orElseThrow(NotFoundException::new);
 	}
 
-	public Reminder updateReminder(long id, Reminder reminder) {
+	public Reminder updateReminder(long id, String user, Reminder reminder) {
 		ReminderEntity entity = reminderRepository.findByIdOptional(id)
+				                                  .filter(r -> user.equals(r.userId))
 												  .map(e -> ReminderAdapter.toStorage(reminder,
 														                              new Metadata(e.createdAt, clock.instant().getEpochSecond()),
 														                              e))
-												  .orElseThrow(() -> new NotFoundException());
+												  .orElseThrow(NotFoundException::new);
 		
 		reminderRepository.persist(entity);
 		
 		return ReminderAdapter.fromStorage(entity);
 	}
 
-	public void deleteReminder(long id) {
-		if (!reminderRepository.deleteById(id)) {
+	public void deleteReminder(long id, String user) {
+		if (reminderRepository.deleteUserReminderById(id, user) == 0) {
 			throw new NotFoundException();
 		}
 	}
 
-	public List<Long> getSchedule(long id, long start, long end) {
-		return getReminder(id).schedule(start)
-				              .takeWhile(s -> s < end)
-				              .collect(Collectors.toList());
+	public List<Long> getSchedule(long id, String user, long start, long end) {
+		return getReminder(id, user).schedule(start)
+				                    .takeWhile(s -> s < end)
+				                    .collect(Collectors.toList());
 	}
 }

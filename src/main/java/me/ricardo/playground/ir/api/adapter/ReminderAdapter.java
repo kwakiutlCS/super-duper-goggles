@@ -77,7 +77,7 @@ public class ReminderAdapter {
 			
 		} else if (time instanceof DailyRepetion d) {
 			dto.setValue(d.getStart());
-			dto.setUnit(ChronoUnit.DAYS);
+			dto.setUnit(ChronoUnit.DAYS.name());
 			dto.setStep(d.getStep());
 			dto.setZone(d.getZone().getId());
 			dto.setBound(fromService(d.getBound()));

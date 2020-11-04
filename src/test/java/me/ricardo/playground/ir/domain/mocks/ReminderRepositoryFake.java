@@ -14,8 +14,10 @@ public class ReminderRepositoryFake extends ReminderRepository {
 	
 	private long next_id = 1L;
 	
-	public List<ReminderEntity> listAll() {
-		return reminders.values().stream().collect(Collectors.toList());
+	public List<ReminderEntity> findByUser(String user) {
+		return reminders.values().stream()
+				                 .filter(r -> user.equals(r.userId))
+				                 .collect(Collectors.toList());
 	}
 	
 	public void persist(ReminderEntity entity) {
@@ -30,7 +32,13 @@ public class ReminderRepositoryFake extends ReminderRepository {
 		return Optional.ofNullable(reminders.get(id));
 	}
 	
-	public boolean deleteById(Long id) {
-		return reminders.remove(id) != null;
+	public long deleteUserReminderById(long id, String user) {
+		ReminderEntity reminder = reminders.get(id);
+		if (reminder != null && user.equals(reminder.userId)) {
+			reminders.remove(id);
+			return 1;
+		}
+		
+		return 0;
 	}
 }

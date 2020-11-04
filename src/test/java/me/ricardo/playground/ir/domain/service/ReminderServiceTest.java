@@ -39,12 +39,12 @@ public class ReminderServiceTest {
 	@Test
 	public void shouldUpdateReminderContent() {
 		// data
-		Reminder reminder = Reminder.Builder.start().withContent("content").build();
+		Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
 		long id = service.createReminder(reminder).getId();
 		
 		// action
 		ReminderService svc2 = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-		Reminder result = svc2.updateReminder(id, Reminder.Builder.start().withContent("updated").build());
+		Reminder result = svc2.updateReminder(id, "user", Reminder.Builder.start().withContent("updated").build());
 		
 		// verification
 		assertEquals(TIMESTAMP, result.getMetadata().getCreatedAt());
@@ -55,13 +55,13 @@ public class ReminderServiceTest {
 	@Test
 	public void shouldDeleteReminder() {
 		// data
-		Reminder reminder = Reminder.Builder.start().withContent("original").build();
+		Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
 		long id = service.createReminder(reminder).getId();
 		
 		// action
-		service.deleteReminder(id);
+		service.deleteReminder(id, "user");
 		
 		// verification
-		assertThrows(NotFoundException.class, () -> service.getReminder(id));
+		assertThrows(NotFoundException.class, () -> service.getReminder(id, "user"));
 	}
 }

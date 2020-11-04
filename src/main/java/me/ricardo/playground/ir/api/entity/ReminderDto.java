@@ -2,6 +2,8 @@ package me.ricardo.playground.ir.api.entity;
 
 import javax.validation.Valid;
 
+import me.ricardo.playground.ir.api.validator.Time;
+
 public class ReminderDto {
 
 	private Long id;
@@ -14,7 +16,7 @@ public class ReminderDto {
 	
 	private Long updatedAt;
 	
-	@Valid
+	@Valid @Time
 	private TimeDto time;
 	
 	public Long getId() {
