@@ -6,6 +6,8 @@ public class ReminderDto {
 
 	private Long id;
 	
+	private String user;
+	
 	private String content;
 
 	private Long createdAt;
@@ -53,5 +55,13 @@ public class ReminderDto {
 	
 	public void setTime(TimeDto time) {
 		this.time = time;
+	}
+
+	public String getUser() {
+		return user;
+	}
+	
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

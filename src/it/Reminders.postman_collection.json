@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "f5e4f2d4-64b4-4b8c-b981-0d2ede2e2983",
+		"name": "Reminders",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Reminder",
+			"item": [
+				{
+					"name": "create simple reminder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e5b88c77-0240-441a-9bf9-eec9b220c08a",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "user",
+								"value": "user",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"content\": \"test\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/reminders",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create simple reminder without user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4c58f952-877e-4d80-bcff-c3603cdaaa55",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"content\": \"test\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/reminders",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Get Reminders",
+			"item": [
+				{
+					"name": "get reminders for user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b3b98a1e-d9b5-4f3d-be96-0cbcfc2ef929",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "user",
+								"value": "user",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/reminders",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get reminders without user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a1b62015-debb-4873-afca-ec0547d4412b",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/reminders",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Get Reminder",
+			"item": [
+				{
+					"name": "get reminder for user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ac198f22-ee4a-4bdc-a25d-cc1a664d2cdd",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "user",
+								"value": "user",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/reminders/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get reminder without user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "568be67e-93f9-458c-ba14-89cfbbf54d9b",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/reminders/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

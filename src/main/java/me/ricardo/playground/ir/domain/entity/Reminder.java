@@ -7,6 +7,8 @@ import me.ricardo.playground.ir.domain.entity.repetion.Time;
 public class Reminder {
 
 	private Long id;
+
+	private String user;
 	
 	private String content;
 
@@ -32,6 +34,14 @@ public class Reminder {
 		this.id = id;
 	}
 
+	public String getUser() {
+		return user;
+	}
+	
+	public void setUser(String user) {
+		this.user = user;
+	}
+	
 	public Long getCreatedAt() {
 		return createdAt;
 	}

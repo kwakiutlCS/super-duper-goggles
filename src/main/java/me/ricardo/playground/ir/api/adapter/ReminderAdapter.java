@@ -18,6 +18,7 @@ public class ReminderAdapter {
 	public static Reminder toService(ReminderDto dto) {
 		Reminder reminder = new Reminder(dto.getContent());
 		
+		reminder.setUser(dto.getUser());
 		reminder.setTime(toService(dto.getTime()));
 		
 		return reminder;
@@ -57,6 +58,7 @@ public class ReminderAdapter {
 		dto.setContent(reminder.getContent());
 		
 		dto.setId(reminder.getId());
+		dto.setUser(reminder.getUser());
 		dto.setCreatedAt(reminder.getCreatedAt());
 		dto.setUpdatedAt(reminder.getUpdatedAt());
 		dto.setTime(fromService(reminder.getTime()));

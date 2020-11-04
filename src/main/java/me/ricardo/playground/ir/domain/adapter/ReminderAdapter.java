@@ -20,6 +20,7 @@ public class ReminderAdapter {
 	
 	public static ReminderEntity toStorage(Reminder reminder, ReminderEntity entity) {
 		entity.content = reminder.getContent();
+		entity.userId = reminder.getUser();
 		entity.updatedAt = reminder.getUpdatedAt();
 
 		if (reminder.getId() != null) {
@@ -63,6 +64,7 @@ public class ReminderAdapter {
 	public static Reminder fromStorage(ReminderEntity entity) {
 		Reminder reminder = new Reminder(entity.content);
 		reminder.setId(entity.id);
+		reminder.setUser(entity.userId);
 		reminder.setCreatedAt(entity.createdAt);
 		reminder.setUpdatedAt(entity.updatedAt);
 		reminder.setTime(fromStorage(entity.time));

@@ -50,17 +50,17 @@ public class ReminderResourceTest {
 	
 	@Test
 	public void shouldFindAllReminders() {
-		assertEquals(2, resource.getReminders().size());
+		assertEquals(2, resource.getReminders("user").size());
 	}
 	
 	@Test
 	public void shouldFindReminderById() {
-		assertEquals("1", resource.getReminder(1L).getContent());
+		assertEquals("1", resource.getReminder("user", 1L).getContent());
 	}
 	
 	@Test
 	public void shouldThrowNotFoundFindReminderByNonExistingId() {
-		assertThrows(NotFoundException.class, () -> resource.getReminder(999));
+		assertThrows(NotFoundException.class, () -> resource.getReminder("user", 999));
 	}
 	
 	@Test
@@ -70,10 +70,11 @@ public class ReminderResourceTest {
 		reminder.setContent("content");
 		
 		// action
-		Response result = resource.createReminder(reminder);
+		Response result = resource.createReminder("user", reminder);
 		
 		// verification
 		assertEquals(reminder.getContent(), ((ReminderDto) result.getEntity()).getContent());
+		assertEquals("user", ((ReminderDto) result.getEntity()).getUser());
 		assertEquals(3, ((ReminderDto) result.getEntity()).getId());
 	}
 	
@@ -125,7 +126,7 @@ public class ReminderResourceTest {
 		reminder.setTime(time);
 		
 		// action
-		Response result = resource.createReminder(reminder);
+		Response result = resource.createReminder("user", reminder);
 		
 		// verification
 		assertEquals(60L, ((ReminderDto) result.getEntity()).getTime().getValue());
@@ -149,7 +150,7 @@ public class ReminderResourceTest {
 		reminder.setTime(time);
 		
 		// action
-		Response result = resource.createReminder(reminder);
+		Response result = resource.createReminder("user", reminder);
 		
 		// verification
 		assertEquals(1, ((ReminderDto) result.getEntity()).getTime().getStep());
@@ -171,7 +172,7 @@ public class ReminderResourceTest {
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
 		reminder.setTime(time);
-		long id = ((ReminderDto) resource.createReminder(reminder).getEntity()).getId();
+		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
 		
 		// action
 		List<Long> schedule = resource.getSchedule(id, 0, 200000L);
@@ -196,7 +197,7 @@ public class ReminderResourceTest {
 		reminder.setTime(time);
 		
 		// action
-		Response result = resource.createReminder(reminder);
+		Response result = resource.createReminder("user", reminder);
 		
 		// verification
 		assertEquals(86460, ((ReminderDto) result.getEntity()).getTime().getExceptions().get(0));

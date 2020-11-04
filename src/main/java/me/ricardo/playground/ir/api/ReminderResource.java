@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -37,7 +38,7 @@ public class ReminderResource {
 	}
 	
     @GET
-    public List<ReminderDto> getReminders() {
+    public List<ReminderDto> getReminders(@NotNull @HeaderParam("user") String user) {
         return service.getReminders()
         		      .stream()
         		      .map(ReminderAdapter::fromService)
@@ -46,13 +47,14 @@ public class ReminderResource {
     
     @GET
     @Path("/{id}")
-    public ReminderDto getReminder(@Min(1) @PathParam("id") long id) {
+    public ReminderDto getReminder(@NotNull @HeaderParam("user") String user, @PathParam("id") long id) {
     	return ReminderAdapter.fromService(service.getReminder(id));
     }
     
     @POST
     @Transactional
-    public Response createReminder(@Valid ReminderDto reminder) {
+    public Response createReminder(@NotNull @HeaderParam("user") String user, @Valid ReminderDto reminder) {
+    	reminder.setUser(user);
     	ReminderDto result = ReminderAdapter.fromService(service.createReminder(ReminderAdapter.toService(reminder)));
     	
     	return Response.created(UriBuilder.fromResource(ReminderResource.class).path("/{id}").build(result.getId()))

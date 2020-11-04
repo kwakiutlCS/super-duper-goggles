@@ -11,6 +11,8 @@ public class ReminderEntity extends PanacheEntity {
 
 	public String content;
 	
+	public String userId;
+	
 	public long createdAt;
 
 	public long updatedAt;
