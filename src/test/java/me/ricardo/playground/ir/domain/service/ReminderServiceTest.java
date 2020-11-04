@@ -26,36 +26,36 @@ public class ReminderServiceTest {
 	@Test
 	public void shouldAddCreateTimeAndUpdateTimeToReminderCreated() {
 		// data
-		Reminder reminder = new Reminder("content");
+		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
 		// action
 		Reminder result = service.createReminder(reminder);
 		
 		// verification
-		assertEquals(TIMESTAMP, result.getCreatedAt());
-		assertEquals(TIMESTAMP, result.getUpdatedAt());
+		assertEquals(TIMESTAMP, result.getMetadata().getCreatedAt());
+		assertEquals(TIMESTAMP, result.getMetadata().getUpdatedAt());
 	}
 	
 	@Test
 	public void shouldUpdateReminderContent() {
 		// data
-		Reminder reminder = new Reminder("original");
+		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		long id = service.createReminder(reminder).getId();
 		
 		// action
 		ReminderService svc2 = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-		Reminder result = svc2.updateReminder(id, new Reminder("updated"));
+		Reminder result = svc2.updateReminder(id, Reminder.Builder.start().withContent("updated").build());
 		
 		// verification
-		assertEquals(TIMESTAMP, result.getCreatedAt());
-		assertEquals(TIMESTAMP + 1, result.getUpdatedAt());
+		assertEquals(TIMESTAMP, result.getMetadata().getCreatedAt());
+		assertEquals(TIMESTAMP + 1, result.getMetadata().getUpdatedAt());
 		assertEquals("updated", result.getContent());
 	}
 	
 	@Test
 	public void shouldDeleteReminder() {
 		// data
-		Reminder reminder = new Reminder("original");
+		Reminder reminder = Reminder.Builder.start().withContent("original").build();
 		long id = service.createReminder(reminder).getId();
 		
 		// action

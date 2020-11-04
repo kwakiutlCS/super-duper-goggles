@@ -2,6 +2,7 @@ package me.ricardo.playground.ir.api.entity;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.Min;
 
@@ -18,7 +19,7 @@ public class TimeDto {
 	
 	private BoundDto bound;
 	
-	private List<Long> exceptions;
+	private Set<Long> exceptions;
 
 	public long getValue() {
 		return value;
@@ -60,11 +61,11 @@ public class TimeDto {
 		this.bound = bound;
 	}
 
-	public List<Long> getExceptions() {
+	public Set<Long> getExceptions() {
 		return exceptions;
 	}
 	
-	public void setExceptions(List<Long> exceptions) {
+	public void setExceptions(Set<Long> exceptions) {
 		this.exceptions = exceptions;
 	}
 }

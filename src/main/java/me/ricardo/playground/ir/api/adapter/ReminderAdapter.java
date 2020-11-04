@@ -16,12 +16,11 @@ import me.ricardo.playground.ir.domain.entity.repetion.Time;
 public class ReminderAdapter {
 
 	public static Reminder toService(ReminderDto dto) {
-		Reminder reminder = new Reminder(dto.getContent());
-		
-		reminder.setUser(dto.getUser());
-		reminder.setTime(toService(dto.getTime()));
-		
-		return reminder;
+		return Reminder.Builder.start()
+		                       .withContent(dto.getContent())
+		                       .withUser(dto.getUser())
+		                       .withTime(toService(dto.getTime()))
+		                       .build();
 	}
 	
 	private static Time toService(TimeDto dto) {
@@ -59,8 +58,8 @@ public class ReminderAdapter {
 		
 		dto.setId(reminder.getId());
 		dto.setUser(reminder.getUser());
-		dto.setCreatedAt(reminder.getCreatedAt());
-		dto.setUpdatedAt(reminder.getUpdatedAt());
+		dto.setCreatedAt(reminder.getMetadata().getCreatedAt());
+		dto.setUpdatedAt(reminder.getMetadata().getUpdatedAt());
 		dto.setTime(fromService(reminder.getTime()));
 		
 		return dto;

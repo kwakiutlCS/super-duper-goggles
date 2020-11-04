@@ -1,7 +1,7 @@
 package me.ricardo.playground.ir.storage.entity;
 
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
@@ -26,5 +26,5 @@ public class TimeEntity extends PanacheEntity {
 	
 	@ElementCollection
 	@CollectionTable(name="Exception")
-	public List<Long> exceptions;
+	public Set<Long> exceptions;
 }

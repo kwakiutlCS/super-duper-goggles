@@ -6,7 +6,7 @@ import me.ricardo.playground.ir.utils.Utils;
 
 public final class FixedTime implements Time {
 
-	private long time;
+	private final long time;
 	
 	public FixedTime(long time) {
 		this.time = Utils.truncateToMinute(time);

@@ -11,7 +11,7 @@ public class ReminderTest {
 	@Test
 	public void shouldHaveEmptyScheduleIfNoTime() {
 		// data
-		Reminder reminder = new Reminder("content");
+		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
 		// verification
 		assertEquals(Optional.empty(), reminder.schedule().findAny());

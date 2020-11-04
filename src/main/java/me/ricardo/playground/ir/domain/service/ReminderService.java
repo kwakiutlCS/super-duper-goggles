@@ -8,6 +8,7 @@ import javax.enterprise.context.Dependent;
 import javax.ws.rs.NotFoundException;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
+import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
@@ -25,11 +26,7 @@ public class ReminderService {
 	}
 
 	public Reminder createReminder(Reminder reminder) {
-		long timestamp = clock.instant().getEpochSecond();
-		reminder.setCreatedAt(timestamp);
-		reminder.setUpdatedAt(timestamp);
-
-		ReminderEntity entity = ReminderAdapter.toStorage(reminder);
+		ReminderEntity entity = ReminderAdapter.toStorage(reminder, new Metadata(clock.instant().getEpochSecond()));
 		reminderRepository.persist(entity);
 
 		return ReminderAdapter.fromStorage(entity);
@@ -49,10 +46,10 @@ public class ReminderService {
 	}
 
 	public Reminder updateReminder(long id, Reminder reminder) {
-		reminder.setUpdatedAt(clock.instant().getEpochSecond());
-		
 		ReminderEntity entity = reminderRepository.findByIdOptional(id)
-												  .map(e -> ReminderAdapter.toStorage(reminder, e))
+												  .map(e -> ReminderAdapter.toStorage(reminder,
+														                              new Metadata(e.createdAt, clock.instant().getEpochSecond()),
+														                              e))
 												  .orElseThrow(() -> new NotFoundException());
 		
 		reminderRepository.persist(entity);

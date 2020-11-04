@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldHaveUnboundedOneDayRepetion() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP));
+		Time time = new DailyRepetion(TIMESTAMP);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY, TIMESTAMP+2*DAY), reminder.schedule().limit(3).collect(Collectors.toList()));
@@ -30,8 +31,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldHaveBoundedOneDayRepetion() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP), reminder.schedule().limit(3).collect(Collectors.toList()));
@@ -40,8 +41,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldHaveBoundedOneDayRepetion2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.schedule().limit(3).collect(Collectors.toList()));
@@ -50,8 +51,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldHaveMultipleDayRepetion() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 2, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 2, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP, TIMESTAMP+ 2*DAY, TIMESTAMP+ 4*DAY), reminder.schedule().limit(3).collect(Collectors.toList()));
@@ -60,8 +61,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldOneDayRepetionFromStartingPoint() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP));
+		Time time = new DailyRepetion(TIMESTAMP);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.schedule(TIMESTAMP+1).limit(3).collect(Collectors.toList()));
@@ -70,8 +71,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldOneDayRepetionFromStartingPoint2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP));
+		Time time = new DailyRepetion(TIMESTAMP);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.schedule(TIMESTAMP+DAY-1).limit(3).collect(Collectors.toList()));
@@ -80,8 +81,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldMultipleDayRepetionFromStartingPoint() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.schedule(TIMESTAMP+1).limit(3).collect(Collectors.toList()));
@@ -90,8 +91,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldMultipleDayRepetionFromStartingPoint2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.schedule(TIMESTAMP+DAY-1).limit(3).collect(Collectors.toList()));
@@ -100,8 +101,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldMultipleDayRepetionFromStartingPoint3() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.schedule(TIMESTAMP+ 2*DAY + 1).limit(3).collect(Collectors.toList()));
@@ -110,8 +111,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldMultipleDayRepetionFromStartingPoint4() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.schedule(TIMESTAMP+ 2*DAY - 1).limit(3).collect(Collectors.toList()));
@@ -120,8 +121,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldMultipleDayRepetionFromStartingPointIntegerStep() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.schedule(TIMESTAMP+3*DAY).limit(3).collect(Collectors.toList()));
@@ -130,8 +131,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldScheduleInDaySavingsChanges() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(0, 1, Bound.none(), ZoneId.of("Europe/Lisbon")));
+		Time time = new DailyRepetion(0, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(1603497600, reminder.schedule(1603497600L).limit(3).collect(Collectors.toList()).get(0));
@@ -142,8 +143,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldScheduleInDaySavingsChanges2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon")));
+		Time time = new DailyRepetion(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(1585281600, reminder.schedule(1585281600L).limit(3).collect(Collectors.toList()).get(0));
@@ -154,8 +155,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldScheduleInDaySavingsChanges3() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon")));
+		Time time = new DailyRepetion(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(1603591320, reminder.schedule(1603591260).limit(3).collect(Collectors.toList()).get(0));
@@ -164,27 +165,27 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldTruncateTimeToMinute() {
 		// data
-		Reminder reminder = new Reminder("content");
+		Reminder.Builder builder = Reminder.Builder.start();
 		
 		// verification
-		reminder.setTime(new DailyRepetion(20));
-		assertEquals(0, reminder.schedule().limit(1).collect(Collectors.toList()).get(0));
+		Reminder r1 = builder.withTime(new FixedTime(20)).build();
+		assertEquals(0, r1.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new DailyRepetion(60));
-		assertEquals(60, reminder.schedule().limit(1).collect(Collectors.toList()).get(0));
+		Reminder r2 = builder.withTime(new FixedTime(60)).build();
+		assertEquals(60, r2.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new DailyRepetion(80));
-		assertEquals(60, reminder.schedule().limit(1).collect(Collectors.toList()).get(0));
+		Reminder r3 = builder.withTime(new FixedTime(80)).build();
+		assertEquals(60, r3.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new DailyRepetion(120));
-		assertEquals(120, reminder.schedule().limit(1).collect(Collectors.toList()).get(0));
+		Reminder r4 = builder.withTime(new FixedTime(120)).build();
+		assertEquals(120, r4.schedule().collect(Collectors.toList()).get(0));
 	}
 	
 	@Test
 	public void shouldBoundScheduleByCount() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.schedule().limit(3).collect(Collectors.toList()));
@@ -193,8 +194,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldBoundScheduleByCount2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY+1).limit(10).collect(Collectors.toList()));
@@ -203,8 +204,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldBoundScheduleByCount3() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+4*DAY).limit(10).collect(Collectors.toList()));
@@ -213,8 +214,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldBoundScheduleByCount4() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new DailyRepetion(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC));
+		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC);
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(), reminder.schedule(TIMESTAMP+7*DAY).limit(10).collect(Collectors.toList()));
@@ -223,9 +224,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldAllowCancelSpecificIterationOfReminder() {
 		// data
-		Reminder reminder = new Reminder("content");
-		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, List.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
-		reminder.setTime(time);
+		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));
@@ -234,9 +234,8 @@ public class DailyRepetionTest {
 	@Test
 	public void shouldAllowCancelSpecificIterationOfReminder2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), List.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
-		reminder.setTime(time);
+		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));

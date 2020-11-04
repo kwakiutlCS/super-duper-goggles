@@ -6,32 +6,28 @@ public class Bound {
 		NO_BOUND, COUNT_BOUND, TIMESTAMP_BOUND;
 	}
 	
-	private BoundType type;
+	private final BoundType type;
 	
-	private long limit;
+	private final long limit;
 	
-	private long timestamp;
+	private final long timestamp;
 	
-	private Bound(BoundType type) {
+	private Bound(BoundType type, long limit, long timestamp) {
 		this.type = type;
+		this.limit = limit;
+		this.timestamp = timestamp;
 	}
 	
 	public static Bound none() {
-		return new Bound(BoundType.NO_BOUND);
+		return new Bound(BoundType.NO_BOUND, 0, 0);
 	}
 	
 	public static Bound timestamp(long timestamp) {
-		Bound bound = new Bound(BoundType.TIMESTAMP_BOUND);
-		bound.timestamp = timestamp;
-		
-		return bound;
+		return new Bound(BoundType.TIMESTAMP_BOUND, 0, timestamp);
 	}
 	
 	public static Bound count(long limit) {
-		Bound bound = new Bound(BoundType.COUNT_BOUND);
-		bound.limit = limit;
-		
-		return bound;
+		return new Bound(BoundType.COUNT_BOUND, limit, 0);
 	}
 	
 	public long getLimit() {

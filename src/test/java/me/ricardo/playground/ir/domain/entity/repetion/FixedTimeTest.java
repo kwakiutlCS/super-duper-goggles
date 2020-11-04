@@ -16,8 +16,10 @@ public class FixedTimeTest {
 	@Test
 	public void shouldHaveOneElementSchedule() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new FixedTime(TIMESTAMP));
+		Reminder reminder = Reminder.Builder.start()
+				                            .withContent("content")
+				                            .withTime(new FixedTime(TIMESTAMP))
+				                            .build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP), reminder.schedule().collect(Collectors.toList()));
@@ -26,8 +28,10 @@ public class FixedTimeTest {
 	@Test
 	public void shouldHaveOneElementScheduleFromOffset() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new FixedTime(TIMESTAMP));
+		Reminder reminder = Reminder.Builder.start()
+							                .withContent("content")
+							                .withTime(new FixedTime(TIMESTAMP))
+							                .build();
 		
 		// verification
 		assertEquals(List.of(TIMESTAMP), reminder.schedule(TIMESTAMP).collect(Collectors.toList()));
@@ -36,8 +40,10 @@ public class FixedTimeTest {
 	@Test
 	public void shouldHaveOneElementScheduleFromOffset2() {
 		// data
-		Reminder reminder = new Reminder("content");
-		reminder.setTime(new FixedTime(TIMESTAMP));
+		Reminder reminder = Reminder.Builder.start()
+							                .withContent("content")
+							                .withTime(new FixedTime(TIMESTAMP))
+							                .build();
 		
 		// verification
 		assertEquals(List.of(), reminder.schedule(TIMESTAMP+1).collect(Collectors.toList()));
@@ -46,19 +52,19 @@ public class FixedTimeTest {
 	@Test
 	public void shouldTruncateTimeToMinute() {
 		// data
-		Reminder reminder = new Reminder("content");
+		Reminder.Builder builder = Reminder.Builder.start();
 		
 		// verification
-		reminder.setTime(new FixedTime(20));
-		assertEquals(0, reminder.schedule().collect(Collectors.toList()).get(0));
+		Reminder r1 = builder.withTime(new FixedTime(20)).build();
+		assertEquals(0, r1.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new FixedTime(60));
-		assertEquals(60, reminder.schedule().collect(Collectors.toList()).get(0));
+		Reminder r2 = builder.withTime(new FixedTime(60)).build();
+		assertEquals(60, r2.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new FixedTime(80));
-		assertEquals(60, reminder.schedule().collect(Collectors.toList()).get(0));
+		Reminder r3 = builder.withTime(new FixedTime(80)).build();
+		assertEquals(60, r3.schedule().collect(Collectors.toList()).get(0));
 		
-		reminder.setTime(new FixedTime(120));
-		assertEquals(120, reminder.schedule().collect(Collectors.toList()).get(0));
+		Reminder r4 = builder.withTime(new FixedTime(120)).build();
+		assertEquals(120, r4.schedule().collect(Collectors.toList()).get(0));
 	}
 }

@@ -3,6 +3,7 @@ package me.ricardo.playground.ir.domain.adapter;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
+import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
@@ -14,21 +15,18 @@ import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
 public class ReminderAdapter {
 	
-	public static ReminderEntity toStorage(Reminder reminder) {
-		return toStorage(reminder, new ReminderEntity());
+	public static ReminderEntity toStorage(Reminder reminder, Metadata metadata) {
+		return toStorage(reminder, metadata, new ReminderEntity());
 	}
 	
-	public static ReminderEntity toStorage(Reminder reminder, ReminderEntity entity) {
+	public static ReminderEntity toStorage(Reminder reminder, Metadata metadata, ReminderEntity entity) {
 		entity.content = reminder.getContent();
 		entity.userId = reminder.getUser();
-		entity.updatedAt = reminder.getUpdatedAt();
+		entity.createdAt = metadata.getCreatedAt();
+		entity.updatedAt = metadata.getUpdatedAt();
 
 		if (reminder.getId() != null) {
 			entity.id = reminder.getId();
-		}
-		
-		if (reminder.getCreatedAt() != null) {
-			entity.createdAt = reminder.getCreatedAt();
 		}
 		
 		if (reminder.getTime() != null) {
@@ -62,14 +60,13 @@ public class ReminderAdapter {
 	}
 	
 	public static Reminder fromStorage(ReminderEntity entity) {
-		Reminder reminder = new Reminder(entity.content);
-		reminder.setId(entity.id);
-		reminder.setUser(entity.userId);
-		reminder.setCreatedAt(entity.createdAt);
-		reminder.setUpdatedAt(entity.updatedAt);
-		reminder.setTime(fromStorage(entity.time));
-		
-		return reminder;
+		return Reminder.Builder.start()
+				               .withContent(entity.content)
+				               .withId(entity.id)
+				               .withUser(entity.userId)
+				               .withMetadata(new Metadata(entity.createdAt, entity.updatedAt))
+				               .withTime(fromStorage(entity.time))
+				               .build();
 	}
 
 	private static Time fromStorage(TimeEntity entity) {

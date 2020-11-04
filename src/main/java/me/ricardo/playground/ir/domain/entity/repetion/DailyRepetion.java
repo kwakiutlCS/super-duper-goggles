@@ -6,35 +6,36 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import me.ricardo.playground.ir.utils.Utils;
 
 public final class DailyRepetion implements Time {
 
-	final private long start;
+	private final long start;
 	
-	final private Bound bound;
+	private final Bound bound;
 	
-	final private int hour;
+	private final int hour;
 	
-	final private int minute;
+	private final int minute;
 	
-	final private int step;
+	private final int step;
 	
-	final private ZoneId zone;
+	private final ZoneId zone;
 	
-	final private List<Long> exceptions;
+	private final Set<Long> exceptions;
 	
 	public DailyRepetion(long start) {
 		this(start, 1, Bound.none(), ZoneOffset.UTC);
 	}
 	
 	public DailyRepetion(long start, int step, Bound bound, ZoneId zone) {
-		this(start, step, bound, zone, List.of());
+		this(start, step, bound, zone, Set.of());
 	}
 	
-	public DailyRepetion(long start, int step, Bound bound, ZoneId zone, List<Long> exceptions) {
+	public DailyRepetion(long start, int step, Bound bound, ZoneId zone, Set<Long> exceptions) {
 		this.start = Utils.truncateToMinute(start);
 		this.bound = bound;
 		this.step = step;
@@ -60,7 +61,7 @@ public final class DailyRepetion implements Time {
 		return bound;
 	}
 	
-	public List<Long> getExceptions() {
+	public Set<Long> getExceptions() {
 		return exceptions;
 	}
 	
