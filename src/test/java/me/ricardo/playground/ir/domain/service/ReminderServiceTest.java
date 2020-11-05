@@ -15,7 +15,7 @@ import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.mocks.ReminderRepositoryFake;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
-public class ReminderServiceTest {
+class ReminderServiceTest {
 
 	private final static long TIMESTAMP = 1000L;
 	
@@ -24,7 +24,7 @@ public class ReminderServiceTest {
 	private ReminderService service = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
 	
 	@Test
-	public void shouldAddCreateTimeAndUpdateTimeToReminderCreated() {
+	void shouldAddCreateTimeAndUpdateTimeToReminderCreated() {
 		// data
 		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
@@ -37,7 +37,7 @@ public class ReminderServiceTest {
 	}
 	
 	@Test
-	public void shouldUpdateReminderContent() {
+	void shouldUpdateReminderContent() {
 		// data
 		Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
 		long id = service.createReminder(reminder).getId();
@@ -53,7 +53,7 @@ public class ReminderServiceTest {
 	}
 	
 	@Test
-	public void shouldDeleteReminder() {
+	void shouldDeleteReminder() {
 		// data
 		Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
 		long id = service.createReminder(reminder).getId();

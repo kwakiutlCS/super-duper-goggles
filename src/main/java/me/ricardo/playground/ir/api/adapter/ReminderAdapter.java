@@ -3,6 +3,9 @@ package me.ricardo.playground.ir.api.adapter;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
+
+import javax.validation.ConstraintViolationException;
 
 import me.ricardo.playground.ir.api.entity.BoundDto;
 import me.ricardo.playground.ir.api.entity.ReminderDto;
@@ -14,13 +17,19 @@ import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 
 public class ReminderAdapter {
+	
+	private ReminderAdapter() { }
 
 	public static Reminder toService(ReminderDto dto) {
-		return Reminder.Builder.start()
-		                       .withContent(dto.getContent())
-		                       .withUser(dto.getUser())
-		                       .withTime(toService(dto.getTime()))
-		                       .build();
+		try {
+			return Reminder.Builder.start()
+			                       .withContent(dto.getContent())
+			                       .withUser(dto.getUser())
+			                       .withTime(toService(dto.getTime()))
+			                       .build();
+		} catch (IllegalArgumentException e) {
+			throw new ConstraintViolationException(Set.of());
+		}
 	}
 	
 	private static Time toService(TimeDto dto) {
@@ -81,7 +90,7 @@ public class ReminderAdapter {
 			dto.setStep(d.getStep());
 			dto.setZone(d.getZone().getId());
 			dto.setBound(fromService(d.getBound()));
-			dto.setExceptions(d.getExceptions());
+			dto.setExceptions(d.getExceptions().isEmpty() ? null : d.getExceptions());
 		}
 		
 		return dto;

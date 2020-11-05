@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-public class ReminderTest {
+class ReminderTest {
 
 	@Test
-	public void shouldHaveEmptyScheduleIfNoTime() {
+	void shouldHaveEmptyScheduleIfNoTime() {
 		// data
 		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		

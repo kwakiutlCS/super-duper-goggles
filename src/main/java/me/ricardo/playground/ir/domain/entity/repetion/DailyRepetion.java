@@ -16,10 +16,6 @@ public final class DailyRepetion implements Time {
 	
 	private final Bound bound;
 	
-	private final int hour;
-	
-	private final int minute;
-	
 	private final int step;
 	
 	private final ZoneId zone;
@@ -39,9 +35,7 @@ public final class DailyRepetion implements Time {
 		this.bound = bound;
 		this.step = step;
 		this.zone = zone;
-		this.hour = Utils.parseHour(this.start, zone);
-		this.minute = Utils.parseMinute(this.start, zone);
-		this.exceptions = exceptions;
+		this.exceptions = exceptions == null ? Set.of() : validateExceptions(exceptions);
 	}
 
 	public long getStart() {
@@ -71,6 +65,11 @@ public final class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
+		return scheduleBeforeExceptions(offset).filter(s -> !exceptions.contains(s));
+	}
+	
+	
+	private Stream<Long> scheduleBeforeExceptions(long offset) {
 		var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
 		var iterations = calculateNumberIterations(startDate, offset);
@@ -80,8 +79,7 @@ public final class DailyRepetion implements Time {
 		var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
 			     	 	     		.map(ZonedDateTime::toEpochSecond);
 		
-		return bound(noBoundSchedule, iterations)
-			       .filter(v -> !exceptions.contains(v));
+		return bound(noBoundSchedule, iterations);
 	}
 	
 	
@@ -107,5 +105,20 @@ public final class DailyRepetion implements Time {
 		default:
 			return schedule;
 		}
+	}
+	
+	
+	private Set<Long> validateExceptions(Set<Long> exceptions) {
+		for (Long exception : exceptions) {
+			boolean isNotScheduled = scheduleBeforeExceptions(exception).takeWhile(s -> s <= exception)
+									                                    .findAny()
+									                                    .isEmpty();
+			
+			if (isNotScheduled) {
+				throw new IllegalArgumentException();
+			}
+		}
+		
+		return exceptions;
 	}
 }

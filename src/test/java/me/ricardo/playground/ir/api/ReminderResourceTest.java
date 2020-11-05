@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Clock;
@@ -25,14 +26,14 @@ import me.ricardo.playground.ir.domain.service.ReminderService;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
-public class ReminderResourceTest {
+class ReminderResourceTest {
 
 	private final static long TIMESTAMP = 1000L;
 	
 	private ReminderResource resource;
 	
 	@BeforeEach
-	public void init() {
+	void init() {
 		ReminderEntity entity1 = new ReminderEntity();
 		entity1.content = "1";
 		entity1.userId = "user";
@@ -53,32 +54,32 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldFindAllReminders() {
+	void shouldFindAllReminders() {
 		assertEquals(2, resource.getReminders("user").size());
 	}
 	
 	@Test
-	public void shouldNotFindRemindersForDifferentUser() {
+	void shouldNotFindRemindersForDifferentUser() {
 		assertEquals(0, resource.getReminders("notTheUser").size());
 	}
 	
 	@Test
-	public void shouldFindReminderById() {
+	void shouldFindReminderById() {
 		assertEquals("1", resource.getReminder("user", 1L).getContent());
 	}
 	
 	@Test
-	public void shouldNotFindReminderByIdForDifferentUser() {
+	void shouldNotFindReminderByIdForDifferentUser() {
 		assertThrows(NotFoundException.class, () -> resource.getReminder("notTheUser", 1));
 	}
 	
 	@Test
-	public void shouldThrowNotFoundFindReminderByNonExistingId() {
+	void shouldThrowNotFoundFindReminderByNonExistingId() {
 		assertThrows(NotFoundException.class, () -> resource.getReminder("user", 999));
 	}
 	
 	@Test
-	public void shouldCreateReminder() {
+	void shouldCreateReminder() {
 		// data
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -93,7 +94,7 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldUpdateReminder() {
+	void shouldUpdateReminder() {
 		// data
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -107,7 +108,7 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldThrowNotFoundForUpdateReminderOfDifferentUser() {
+	void shouldThrowNotFoundForUpdateReminderOfDifferentUser() {
 		// data
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -117,7 +118,7 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldThrowNotFoundForUpdateInexistentReminder() {
+	void shouldThrowNotFoundForUpdateInexistentReminder() {
 		// data
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -127,7 +128,7 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldDeleteReminder() {
+	void shouldDeleteReminder() {
 		// action
 		Response result = resource.deleteReminder("user", 1);
 				
@@ -136,17 +137,17 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldThrowExceptionDeleteReminderOtherUser() {
+	void shouldThrowExceptionDeleteReminderOtherUser() {
 		assertThrows(NotFoundException.class, () -> resource.deleteReminder("notTheUser", 1));
 	}
 	
 	@Test
-	public void shouldThrowExceptionDeleteNonExistentReminder() {
+	void shouldThrowExceptionDeleteNonExistentReminder() {
 		assertThrows(NotFoundException.class, () -> resource.deleteReminder("user", 999));
 	}
 	
 	@Test
-	public void shouldCreateFixedTimeReminder() {
+	void shouldCreateFixedTimeReminder() {
 		// data
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -162,7 +163,7 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldCreateDailyRepetionTimeReminder() {
+	void shouldCreateDailyRepetionTimeReminder() {
 		// data
 		BoundDto bound = new BoundDto();
 		bound.setLimit(3L);
@@ -186,17 +187,17 @@ public class ReminderResourceTest {
 		assertEquals("DAYS", ((ReminderDto) result.getEntity()).getTime().getUnit());
 		assertEquals("UTC", ((ReminderDto) result.getEntity()).getTime().getZone());
 		assertEquals(3, ((ReminderDto) result.getEntity()).getTime().getBound().getLimit());
+		assertNull(((ReminderDto) result.getEntity()).getTime().getExceptions());
 	}
 	
 	@Test
-	public void shouldRetrieveReminderSchedule() {
+	void shouldRetrieveReminderSchedule() {
 		// data
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
 		time.setStep(1);
 		time.setUnit("DAYS");
 		time.setZone("UTC");
-		time.setExceptions(Set.of());
 		
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -213,14 +214,13 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldThrowNotFoundExceptionRetrieveReminderScheduleOfDifferentUser() {
+	void shouldThrowNotFoundExceptionRetrieveReminderScheduleOfDifferentUser() {
 		// data
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
 		time.setStep(1);
 		time.setUnit("DAYS");
 		time.setZone("UTC");
-		time.setExceptions(Set.of());
 		
 		ReminderDto reminder = new ReminderDto();
 		reminder.setContent("content");
@@ -232,12 +232,12 @@ public class ReminderResourceTest {
 	}
 	
 	@Test
-	public void shouldThrowExceptionIfCalculateScheduleWithEndBeforeStart() {
+	void shouldThrowExceptionIfCalculateScheduleWithEndBeforeStart() {
 		assertThrows(ConstraintViolationException.class, () -> resource.getSchedule("user", 1L, 8L, 8L));
 	}
 	
 	@Test
-	public void shouldAddAndRetrieveExceptionsToDailyReminder() {
+	void shouldAddAndRetrieveExceptionsToDailyReminder() {
 		// data
 		TimeDto time = new TimeDto();
 		time.setValue(60L);
@@ -254,5 +254,22 @@ public class ReminderResourceTest {
 		
 		// verification
 		assertEquals(86460, ((ReminderDto) result.getEntity()).getTime().getExceptions().toArray(new Long[1])[0]);
+	}
+	
+	@Test
+	void shouldThrowExceptionIfExceptionsAreNotScheduled() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit("DAYS");
+		time.setExceptions(Set.of(60L + ChronoUnit.DAYS.getDuration().getSeconds(), 9999999999L));
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		
+		// verification
+		assertThrows(ConstraintViolationException.class, () -> resource.createReminder("user", reminder));
 	}
 }

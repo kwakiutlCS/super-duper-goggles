@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 
-public class DailyRepetionTest {
+class DailyRepetionTest {
 
 	private static final long TIMESTAMP = 1020L;
 	
 	private static final long DAY = 86400;
 
 	@Test
-	public void shouldHaveUnboundedOneDayRepetion() {
+	void shouldHaveUnboundedOneDayRepetion() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -29,7 +29,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldHaveBoundedOneDayRepetion() {
+	void shouldHaveBoundedOneDayRepetion() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -39,7 +39,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldHaveBoundedOneDayRepetion2() {
+	void shouldHaveBoundedOneDayRepetion2() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -49,7 +49,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldHaveMultipleDayRepetion() {
+	void shouldHaveMultipleDayRepetion() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 2, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -59,7 +59,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldOneDayRepetionFromStartingPoint() {
+	void shouldOneDayRepetionFromStartingPoint() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -69,7 +69,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldOneDayRepetionFromStartingPoint2() {
+	void shouldOneDayRepetionFromStartingPoint2() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -79,7 +79,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldMultipleDayRepetionFromStartingPoint() {
+	void shouldMultipleDayRepetionFromStartingPoint() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -89,7 +89,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldMultipleDayRepetionFromStartingPoint2() {
+	void shouldMultipleDayRepetionFromStartingPoint2() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -99,7 +99,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldMultipleDayRepetionFromStartingPoint3() {
+	void shouldMultipleDayRepetionFromStartingPoint3() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -109,7 +109,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldMultipleDayRepetionFromStartingPoint4() {
+	void shouldMultipleDayRepetionFromStartingPoint4() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -119,7 +119,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldMultipleDayRepetionFromStartingPointIntegerStep() {
+	void shouldMultipleDayRepetionFromStartingPointIntegerStep() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -129,7 +129,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldScheduleInDaySavingsChanges() {
+	void shouldScheduleInDaySavingsChanges() {
 		// data
 		Time time = new DailyRepetion(0, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -141,7 +141,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldScheduleInDaySavingsChanges2() {
+	void shouldScheduleInDaySavingsChanges2() {
 		// data
 		Time time = new DailyRepetion(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -153,7 +153,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldScheduleInDaySavingsChanges3() {
+	void shouldScheduleInDaySavingsChanges3() {
 		// data
 		Time time = new DailyRepetion(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -163,7 +163,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldTruncateTimeToMinute() {
+	void shouldTruncateTimeToMinute() {
 		// data
 		Reminder.Builder builder = Reminder.Builder.start();
 		
@@ -182,7 +182,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldBoundScheduleByCount() {
+	void shouldBoundScheduleByCount() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -192,7 +192,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldBoundScheduleByCount2() {
+	void shouldBoundScheduleByCount2() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -202,7 +202,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldBoundScheduleByCount3() {
+	void shouldBoundScheduleByCount3() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -212,7 +212,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldBoundScheduleByCount4() {
+	void shouldBoundScheduleByCount4() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -222,7 +222,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldAllowCancelSpecificIterationOfReminder() {
+	void shouldAllowCancelSpecificIterationOfReminder() {
 		// data
 		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
@@ -232,7 +232,7 @@ public class DailyRepetionTest {
 	}
 	
 	@Test
-	public void shouldAllowCancelSpecificIterationOfReminder2() {
+	void shouldAllowCancelSpecificIterationOfReminder2() {
 		// data
 		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();

@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 
-public class FixedTimeTest {
+class FixedTimeTest {
 
 	private static final long TIMESTAMP = 1020L;
 
 	@Test
-	public void shouldHaveOneElementSchedule() {
+	void shouldHaveOneElementSchedule() {
 		// data
 		Reminder reminder = Reminder.Builder.start()
 				                            .withContent("content")
@@ -26,7 +26,7 @@ public class FixedTimeTest {
 	}
 	
 	@Test
-	public void shouldHaveOneElementScheduleFromOffset() {
+	void shouldHaveOneElementScheduleFromOffset() {
 		// data
 		Reminder reminder = Reminder.Builder.start()
 							                .withContent("content")
@@ -38,7 +38,7 @@ public class FixedTimeTest {
 	}
 	
 	@Test
-	public void shouldHaveOneElementScheduleFromOffset2() {
+	void shouldHaveOneElementScheduleFromOffset2() {
 		// data
 		Reminder reminder = Reminder.Builder.start()
 							                .withContent("content")
@@ -50,7 +50,7 @@ public class FixedTimeTest {
 	}
 	
 	@Test
-	public void shouldTruncateTimeToMinute() {
+	void shouldTruncateTimeToMinute() {
 		// data
 		Reminder.Builder builder = Reminder.Builder.start();
 		

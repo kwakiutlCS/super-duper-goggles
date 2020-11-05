@@ -15,6 +15,8 @@ import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
 public class ReminderAdapter {
 	
+	private ReminderAdapter() { }
+	
 	public static ReminderEntity toStorage(Reminder reminder, Metadata metadata) {
 		return toStorage(reminder, metadata, new ReminderEntity());
 	}

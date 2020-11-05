@@ -126,7 +126,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [2, 3, 4]\n    }\n}",
+							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [86400]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -832,6 +832,53 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [1,2,-3]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/reminders",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create reminder with missing exceptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4d3365ff-a320-4a4a-95d3-f23f4b2bfb63",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "user",
+								"type": "text",
+								"value": "user"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [86400, 86600]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1746,7 +1793,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 10000000,\n        \"zone\": \"UTC\",\n        \"step\": 3,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 4\n        },\n        \"exceptions\": [2, 3, 4]\n    }\n}",
+							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 0,\n        \"zone\": \"UTC\",\n        \"step\": 3,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 4\n        },\n        \"exceptions\": [777600]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2371,6 +2418,54 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [1,2,-3]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/reminders/{{reminderId}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"{{reminderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update reminder with missing exceptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5500ce5d-6f0a-4971-8b8c-30edb41345a8",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "user",
+								"type": "text",
+								"value": "user"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"test\",\n    \"time\": {\n        \"value\": 1,\n        \"zone\": \"UTC\",\n        \"step\": 1,\n        \"unit\": \"DAYS\",\n        \"bound\": {\n            \"limit\": 3\n        },\n        \"exceptions\": [86400, 86600]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
