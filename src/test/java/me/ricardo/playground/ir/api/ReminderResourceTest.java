@@ -205,12 +205,77 @@ class ReminderResourceTest {
 		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
 		
 		// action
-		List<Long> schedule = resource.getSchedule("user", id, 0L, 200000L);
+		List<Long> schedule = resource.getSchedule("user", id, 0L, 200000L, null);
 		
 		// verification
 		assertEquals(60L, schedule.get(0));
 		assertEquals(86460L, schedule.get(1));
 		assertEquals(172860L, schedule.get(2));
+	}
+	
+	@Test
+	void shouldRetrieveReminderScheduleWithLimitAndEnd() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit("DAYS");
+		time.setZone("UTC");
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
+		
+		// action
+		List<Long> schedule = resource.getSchedule("user", id, 0L, 200000L, 1L);
+		
+		// verification
+		assertEquals(60L, schedule.get(0));
+		assertEquals(1, schedule.size());
+	}
+
+	@Test
+	void shouldRetrieveReminderScheduleWithLimitAndEnd2() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit("DAYS");
+		time.setZone("UTC");
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
+		
+		// action
+		List<Long> schedule = resource.getSchedule("user", id, 120L, 121L, 1L);
+		
+		// verification
+		assertEquals(0, schedule.size());
+	}
+	
+	@Test
+	void shouldRetrieveReminderScheduleWithLimit() {
+		// data
+		TimeDto time = new TimeDto();
+		time.setValue(60L);
+		time.setStep(1);
+		time.setUnit("DAYS");
+		time.setZone("UTC");
+		
+		ReminderDto reminder = new ReminderDto();
+		reminder.setContent("content");
+		reminder.setTime(time);
+		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
+		
+		// action
+		List<Long> schedule = resource.getSchedule("user", id, 0L, null, 1L);
+		
+		// verification
+		assertEquals(60L, schedule.get(0));
+		assertEquals(1, schedule.size());
 	}
 	
 	@Test
@@ -228,12 +293,17 @@ class ReminderResourceTest {
 		long id = ((ReminderDto) resource.createReminder("user", reminder).getEntity()).getId();
 		
 		// verification
-	    assertThrows(NotFoundException.class, () -> resource.getSchedule("notTheUser", id, 0L, 200000L));
+	    assertThrows(NotFoundException.class, () -> resource.getSchedule("notTheUser", id, 0L, 200000L, null));
 	}
 	
 	@Test
 	void shouldThrowExceptionIfCalculateScheduleWithEndBeforeStart() {
-		assertThrows(ConstraintViolationException.class, () -> resource.getSchedule("user", 1L, 8L, 8L));
+		assertThrows(ConstraintViolationException.class, () -> resource.getSchedule("user", 1L, 8L, 8L, null));
+	}
+	
+	@Test
+	void shouldThrowExceptionIfCalculateScheduleWithoutEndAndLimit() {
+		assertThrows(ConstraintViolationException.class, () -> resource.getSchedule("user", 1L, 8L, null, null));
 	}
 	
 	@Test

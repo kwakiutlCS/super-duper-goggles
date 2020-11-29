@@ -932,6 +932,11 @@
 								"key": "user",
 								"value": "user",
 								"type": "text"
+							},
+							{
+								"key": "Origin",
+								"value": "localhost:8080",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -1235,6 +1240,120 @@
 					"response": []
 				},
 				{
+					"name": "schedule reminder for user with limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e19bb845-832a-4ccf-9363-77d445ff0a69",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.eql([0]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "user",
+								"type": "text",
+								"value": "user"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/reminders/{{reminderId}}/schedule?start=0&limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"{{reminderId}}",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "schedule reminder both limit/end",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "00bef77e-e99d-4d8f-9ed3-09122320ddd9",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should be 0\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.eql([0]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "user",
+								"type": "text",
+								"value": "user"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/reminders/{{reminderId}}/schedule?end=5000000000000000&start=0&limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"{{reminderId}}",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "end",
+									"value": "5000000000000000"
+								},
+								{
+									"key": "start",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "schedule reminder for different user",
 					"event": [
 						{
@@ -1516,6 +1635,56 @@
 								{
 									"key": "end",
 									"value": "4"
+								},
+								{
+									"key": "start",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "schedule reminder invalid limit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "877eb912-0866-46a5-b4d0-2c3fcdbbe12a",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "user",
+								"type": "text",
+								"value": "user"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/reminders/{{reminderId}}/schedule?limit=0&start=4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"reminders",
+								"{{reminderId}}",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "0"
 								},
 								{
 									"key": "start",
@@ -2526,15 +2695,15 @@
 					"response": []
 				},
 				{
-					"name": "delete inexistent reminder",
+					"name": "delete simple reminder",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "265de8d9-aae7-4679-9361-50072c244115",
+								"id": "59b0200e-26a4-4aba-9586-5a681b53a737",
 								"exec": [
-									"pm.test(\"Status code is 404\", function () {",
-									"    pm.response.to.have.status(404);",
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2546,19 +2715,19 @@
 						"header": [
 							{
 								"key": "user",
-								"value": "user",
-								"type": "text"
+								"type": "text",
+								"value": "user"
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/reminders/9999999999",
+							"raw": "localhost:8080/reminders/{{reminderId}}",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"reminders",
-								"9999999999"
+								"{{reminderId}}"
 							]
 						}
 					},
@@ -2604,15 +2773,15 @@
 					"response": []
 				},
 				{
-					"name": "delete simple reminder",
+					"name": "delete inexistent reminder",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "59b0200e-26a4-4aba-9586-5a681b53a737",
+								"id": "265de8d9-aae7-4679-9361-50072c244115",
 								"exec": [
-									"pm.test(\"Status code is 204\", function () {",
-									"    pm.response.to.have.status(204);",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2624,19 +2793,19 @@
 						"header": [
 							{
 								"key": "user",
-								"type": "text",
-								"value": "user"
+								"value": "user",
+								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "localhost:8080/reminders/{{reminderId}}",
+							"raw": "localhost:8080/reminders/9999999999",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"reminders",
-								"{{reminderId}}"
+								"9999999999"
 							]
 						}
 					},

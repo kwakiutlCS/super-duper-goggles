@@ -3,6 +3,7 @@ package me.ricardo.playground.ir.domain.service;
 import java.time.Clock;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
 import javax.ws.rs.NotFoundException;
@@ -65,9 +66,17 @@ public class ReminderService {
 		}
 	}
 
-	public List<Long> getSchedule(long id, String user, long start, long end) {
-		return getReminder(id, user).schedule(start)
-				                    .takeWhile(s -> s < end)
-				                    .collect(Collectors.toList());
+	public List<Long> getSchedule(long id, String user, List<Long> interval, Long limit) {
+		Stream<Long> schedule = getReminder(id, user).schedule(interval.get(0));
+		
+		if (interval.size() == 2) {
+			schedule = schedule.takeWhile(s -> s < interval.get(1));
+		}
+		
+		if (limit != null) {
+			schedule = schedule.limit(limit);
+		}
+		
+		return schedule.collect(Collectors.toList());
 	}
 }

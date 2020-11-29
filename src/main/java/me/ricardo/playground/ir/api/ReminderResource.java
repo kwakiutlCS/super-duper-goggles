@@ -86,11 +86,14 @@ public class ReminderResource {
 	public List<Long> getSchedule(@NotNull @HeaderParam("user") String user,
 			                      @PathParam("id") long id,
 			                      @NotNull @Min(0) @QueryParam("start") Long start,
-			                      @NotNull @Min(1) @QueryParam("end") Long end) {
-    	if (end <= start) {
+			                      @Min(1) @QueryParam("end") Long end,
+			                      @Min(1) @QueryParam("limit") Long limit) {
+    	if ((end == null && limit == null) || (end != null && end <= start)) {
     		throw new ConstraintViolationException(Set.of());
     	}
-    	
-		return service.getSchedule(id, user, start, end);
+    
+    	List<Long> interval = end == null ? List.of(start) : List.of(start, end);
+    
+    	return service.getSchedule(id, user, interval, limit);
 	}
 }
