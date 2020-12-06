@@ -2,11 +2,11 @@ package me.ricardo.playground.ir.domain.service;
 
 import java.time.Clock;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
-import javax.ws.rs.NotFoundException;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Metadata;
@@ -27,6 +27,10 @@ public class ReminderService {
 	}
 
 	public Reminder createReminder(Reminder reminder) {
+		if (reminder.getUser() == null || reminder.getUser().length() == 0) {
+			throw new IllegalArgumentException("");
+		}
+		
 		ReminderEntity entity = ReminderAdapter.toStorage(reminder, new Metadata(clock.instant().getEpochSecond()));
 		reminderRepository.persist(entity);
 
@@ -40,34 +44,35 @@ public class ReminderService {
 								 .collect(Collectors.toList());
 	}
 
-	public Reminder getReminder(long id, String user) {
+	public Optional<Reminder> getReminder(long id, String user) {
 		return reminderRepository.findByIdOptional(id)
-								 .filter(r -> user.equals(r.userId))
-				                 .map(ReminderAdapter::fromStorage)
-				                 .orElseThrow(NotFoundException::new);
+								 .filter(r -> r.userId.equals(user))
+				                 .map(ReminderAdapter::fromStorage);
 	}
 
-	public Reminder updateReminder(long id, String user, Reminder reminder) {
-		ReminderEntity entity = reminderRepository.findByIdOptional(id)
+	public Optional<Reminder> updateReminder(long id, String user, Reminder reminder) {
+		Optional<ReminderEntity> entity = reminderRepository.findByIdOptional(id)
 				                                  .filter(r -> user.equals(r.userId))
 												  .map(e -> ReminderAdapter.toStorage(reminder,
 														                              new Metadata(e.createdAt, clock.instant().getEpochSecond()),
-														                              e))
-												  .orElseThrow(NotFoundException::new);
+														                              e));
 		
-		reminderRepository.persist(entity);
+		entity.ifPresent(reminderRepository::persist);
 		
-		return ReminderAdapter.fromStorage(entity);
+		return entity.map(ReminderAdapter::fromStorage);
 	}
 
-	public void deleteReminder(long id, String user) {
-		if (reminderRepository.deleteUserReminderById(id, user) == 0) {
-			throw new NotFoundException();
-		}
+	public long deleteReminder(long id, String user) {
+		return reminderRepository.deleteUserReminderById(id, user);
 	}
 
 	public List<Long> getSchedule(long id, String user, List<Long> interval, Long limit) {
-		Stream<Long> schedule = getReminder(id, user).schedule(interval.get(0));
+		if (interval == null || interval.isEmpty()) {
+			return List.of();
+		}
+		
+		Stream<Long> schedule = getReminder(id, user).map(r -> r.schedule(interval.get(0)))
+				                                     .orElse(Stream.empty());
 		
 		if (interval.size() == 2) {
 			schedule = schedule.takeWhile(s -> s < interval.get(1));
