@@ -254,6 +254,10 @@ class DailyRepetionTest {
 	
 	@Test
 	void shouldNotAllowExceptionsIfNotPreviouslyOccurring() {
-		assertThrows(IllegalArgumentException.class, () -> new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(99999999L)));
+		// data
+		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(9999999999L));
+		
+		// verification
+		assertEquals(0, time.getExceptions().size());
 	}
 }

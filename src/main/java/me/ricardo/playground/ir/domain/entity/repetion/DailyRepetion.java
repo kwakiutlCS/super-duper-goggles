@@ -6,6 +6,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import me.ricardo.playground.ir.utils.Utils;
@@ -35,7 +36,7 @@ public final class DailyRepetion implements Time {
 		this.bound = bound;
 		this.step = step;
 		this.zone = zone;
-		this.exceptions = exceptions == null ? Set.of() : validateExceptions(exceptions);
+		this.exceptions = exceptions == null ? Set.of() : filterValidExceptions(exceptions);
 	}
 
 	public long getStart() {
@@ -108,17 +109,11 @@ public final class DailyRepetion implements Time {
 	}
 	
 	
-	private Set<Long> validateExceptions(Set<Long> exceptions) {
-		for (Long exception : exceptions) {
-			boolean isNotScheduled = scheduleBeforeExceptions(exception).takeWhile(s -> s <= exception)
-									                                    .findAny()
-									                                    .isEmpty();
-			
-			if (isNotScheduled) {
-				throw new IllegalArgumentException();
-			}
-		}
-		
-		return exceptions;
+	private Set<Long> filterValidExceptions(Set<Long> exceptions) {
+		return exceptions.stream()
+		                 .filter(e -> scheduleBeforeExceptions(e).takeWhile(s -> s <= e)
+		        		                                         .findAny()
+		        		                                         .isPresent())
+		                 .collect(Collectors.toSet());
 	}
 }
