@@ -1,7 +1,6 @@
 package me.ricardo.playground.ir.domain.entity.repetion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;

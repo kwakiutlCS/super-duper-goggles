@@ -1,7 +1,6 @@
 package me.ricardo.playground.ir.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
@@ -101,17 +100,6 @@ class ReminderServiceTest {
 			assertEquals(3L, result.getId());
 			assertEquals(TIMESTAMP, result.getMetadata().getCreatedAt());
 			assertEquals(TIMESTAMP, result.getMetadata().getUpdatedAt());
-		}
-
-		@Test
-		void shouldNotCreateReminderWithoutUser() {
-			// data
-			Reminder reminder1 = Reminder.Builder.start().build();
-			Reminder reminder2 = Reminder.Builder.start().withUser("").build();
-
-			// verification
-			assertThrows(IllegalArgumentException.class, () -> service.createReminder(reminder1));
-			assertThrows(IllegalArgumentException.class, () -> service.createReminder(reminder2));
 		}
 		
 		@Test

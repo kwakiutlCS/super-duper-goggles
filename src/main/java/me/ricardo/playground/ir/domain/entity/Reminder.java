@@ -2,12 +2,15 @@ package me.ricardo.playground.ir.domain.entity;
 
 import java.util.stream.Stream;
 
+import javax.validation.constraints.NotBlank;
+
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 
 public class Reminder {
 
 	private final Long id;
 
+	@NotBlank
 	private final String user;
 	
 	private final String content;

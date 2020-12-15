@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
+import javax.validation.Valid;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Metadata;
@@ -26,11 +27,7 @@ public class ReminderService {
 		this.clock = clock;
 	}
 
-	public Reminder createReminder(Reminder reminder) {
-		if (reminder.getUser() == null || reminder.getUser().length() == 0) {
-			throw new IllegalArgumentException("");
-		}
-		
+	public Reminder createReminder(@Valid Reminder reminder) {
 		ReminderEntity entity = ReminderAdapter.toStorage(reminder, new Metadata(clock.instant().getEpochSecond()));
 		reminderRepository.persist(entity);
 
