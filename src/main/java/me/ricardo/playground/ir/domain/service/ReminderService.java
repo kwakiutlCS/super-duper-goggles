@@ -59,8 +59,13 @@ public class ReminderService {
 		return entity.map(ReminderAdapter::fromStorage);
 	}
 
-	public long deleteReminder(long id, String user) {
-		return reminderRepository.deleteUserReminderById(id, user);
+	public boolean deleteReminder(long id, String user) {
+		Optional<ReminderEntity> reminder = reminderRepository.findByIdOptional(id)
+		                                                      .filter(r -> r.userId.equals(user));
+		
+		reminder.ifPresent(r -> reminderRepository.deleteById(r.id));
+		
+		return reminder.isPresent();
 	}
 
 	public List<Long> getSchedule(long id, String user, List<Long> interval, Long limit) {

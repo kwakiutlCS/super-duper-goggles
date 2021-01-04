@@ -41,4 +41,8 @@ public class ReminderRepositoryFake extends ReminderRepository {
 		
 		return 0;
 	}
+	
+	public boolean deleteById(Long id) {
+		return reminders.remove(id) != null;
+	}
 }

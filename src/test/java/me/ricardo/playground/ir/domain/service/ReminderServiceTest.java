@@ -190,10 +190,10 @@ class ReminderServiceTest {
 			long id = service.createReminder(reminder).getId();
 
 			// action
-			long result = service.deleteReminder(id, "user");
+			boolean result = service.deleteReminder(id, "user");
 
 			// verification
-			assertEquals(1L, result);
+			assertEquals(true, result);
 			assertTrue(service.getReminder(id, "user").isEmpty());
 		}
 
@@ -204,10 +204,10 @@ class ReminderServiceTest {
 			long id = service.createReminder(reminder).getId();
 
 			// action
-			long result = service.deleteReminder(id, "notTheUser");
+			boolean result = service.deleteReminder(id, "notTheUser");
 
 			// verification
-			assertEquals(0L, result);
+			assertEquals(false, result);
 		}
 
 		@Test
@@ -217,10 +217,10 @@ class ReminderServiceTest {
 			service.createReminder(reminder);
 
 			// action
-			long result = service.deleteReminder(999L, "user");
+			boolean result = service.deleteReminder(999L, "user");
 
 			// verification
-			assertEquals(0L, result);
+			assertEquals(false, result);
 		}
 	}
 
