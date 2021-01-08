@@ -26,10 +26,6 @@ public class ReminderAdapter {
 		entity.userId = reminder.getUser();
 		entity.createdAt = metadata.getCreatedAt();
 		entity.updatedAt = metadata.getUpdatedAt();
-
-		if (reminder.getId() != null) {
-			entity.id = reminder.getId();
-		}
 		
 		if (reminder.getTime() != null) {
 			entity.time = toStorage(reminder.getTime());

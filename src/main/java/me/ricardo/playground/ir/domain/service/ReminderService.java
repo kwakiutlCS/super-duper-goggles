@@ -8,10 +8,13 @@ import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
 import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
@@ -47,9 +50,9 @@ public class ReminderService {
 				                 .map(ReminderAdapter::fromStorage);
 	}
 
-	public Optional<Reminder> updateReminder(long id, String user, Reminder reminder) {
-		Optional<ReminderEntity> entity = reminderRepository.findByIdOptional(id)
-				                                  .filter(r -> user.equals(r.userId))
+	public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
+		Optional<ReminderEntity> entity = reminderRepository.findByIdOptional(reminder.getId())
+				                                  .filter(r -> r.userId.equals(reminder.getUser()))
 												  .map(e -> ReminderAdapter.toStorage(reminder,
 														                              new Metadata(e.createdAt, clock.instant().getEpochSecond()),
 														                              e));

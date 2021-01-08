@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
@@ -8,6 +9,9 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+
+import javax.validation.Validation;
+import javax.validation.executable.ExecutableValidator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +33,8 @@ class ReminderServiceTest {
 	private ReminderService service;
 	
 	private ReminderRepository repository;
+	
+	private static ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
 
 	@BeforeEach
 	void init() {
@@ -116,7 +122,7 @@ class ReminderServiceTest {
 		}
 		
 		@Test
-		void shouldCreateDailyRepetionTimeReminder() {
+		void shouldCreateDailyRepetionTimeReminderBoundCount() {
 			// data
 			Time time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
@@ -130,6 +136,31 @@ class ReminderServiceTest {
 			assertEquals(3, ((DailyRepetion) result.getTime()).getBound().getLimit());
 			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
 		}
+		
+		@Test
+		void shouldCreateDailyRepetionTimeReminderBoundTimestamp() {
+			// data
+			Time time = new DailyRepetion(60L, 1, Bound.timestamp(90L), ZoneOffset.UTC);
+			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
+			
+			// action
+			Reminder result = service.createReminder(reminder);
+			
+			// verification
+			assertEquals(1, ((DailyRepetion) result.getTime()).getStep());
+			assertEquals(ZoneOffset.UTC, ((DailyRepetion) result.getTime()).getZone());
+			assertEquals(90L, ((DailyRepetion) result.getTime()).getBound().getTimestamp());
+			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
+		}
+		
+		@Test
+		void shouldNotAllowIdInReminder() throws NoSuchMethodException, SecurityException {
+            // data
+			Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").build();
+			
+			// verification
+			assertFalse(validator.validateParameters(service, ReminderService.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+		}
 	}
 	
 	@Nested
@@ -142,7 +173,7 @@ class ReminderServiceTest {
 
 			// action
 			ReminderService svc2 = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(id, "user", Reminder.Builder.start().withContent("updated").build());
+			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(id).withContent("updated").build());
 
 			// verification
 			assertEquals(TIMESTAMP, result.get().getMetadata().getCreatedAt());
@@ -159,7 +190,7 @@ class ReminderServiceTest {
 
 			// action
 			ReminderService svc2 = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(id, "notTheUser", Reminder.Builder.start().withContent("updated").build());
+			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("notTheUser").withId(id).withContent("updated").build());
 
 			// verification
 			assertTrue(result.isEmpty());
@@ -173,10 +204,19 @@ class ReminderServiceTest {
 
 			// action
 			ReminderService svc2 = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(999L, "user", Reminder.Builder.start().withContent("updated").build());
+			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(999L).withContent("updated").build());
 
 			// verification
 			assertTrue(result.isEmpty());
+		}
+		
+		@Test
+		void shouldRequireIdWhenUpdatingReminder() throws NoSuchMethodException, SecurityException {
+			// data
+			Reminder reminder = Reminder.Builder.start().withUser("user").build();
+						
+			// verification
+			assertFalse(validator.validateParameters(service, ReminderService.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{reminder}).isEmpty());
 		}
 	}
 	

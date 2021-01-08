@@ -3,14 +3,23 @@ package me.ricardo.playground.ir.domain.entity;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Positive;
+import javax.validation.groups.Default;
 
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
+import java.util.Objects;
 
 public class Reminder {
 
+	@NotNull(groups = ReminderUpdate.class)
+	@Positive(groups = ReminderUpdate.class)
+	@Null
 	private final Long id;
 
-	@NotBlank
+	@NotBlank(groups = {Default.class, ReminderUpdate.class})
 	private final String user;
 	
 	private final String content;
@@ -56,54 +65,19 @@ public class Reminder {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((content == null) ? 0 : content.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
-		result = prime * result + ((time == null) ? 0 : time.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
-		return result;
+	public boolean equals(final Object other) {
+		if (!(other instanceof Reminder)) {
+			return false;
+		}
+		Reminder castOther = (Reminder) other;
+		return Objects.equals(id, castOther.id);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Reminder other = (Reminder) obj;
-		if (content == null) {
-			if (other.content != null)
-				return false;
-		} else if (!content.equals(other.content))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (metadata == null) {
-			if (other.metadata != null)
-				return false;
-		} else if (!metadata.equals(other.metadata))
-			return false;
-		if (time == null) {
-			if (other.time != null)
-				return false;
-		} else if (!time.equals(other.time))
-			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.equals(other.user))
-			return false;
-		return true;
+	public int hashCode() {
+		return Objects.hash(id);
 	}
-
+	
 
 	public static class Builder {
 		private Long id;
@@ -120,17 +94,6 @@ public class Reminder {
 		
 		public static Builder start() {
 			return new Builder();
-		}
-		
-		public static Builder start(Reminder reminder) {
-			Builder builder = new Builder();
-			builder.id = reminder.id;
-			builder.user = reminder.user;
-			builder.content = reminder.content;
-			builder.time = reminder.time;
-			builder.metadata = reminder.metadata;
-			
-			return builder;
 		}
 		
 		public Reminder build() {

@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.domain.entity.repetion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -252,11 +253,29 @@ class DailyRepetionTest {
 	}
 	
 	@Test
+	void shouldAddAndRetrieveExceptionsToDailyReminder2() {
+		// data
+		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 60L + ChronoUnit.DAYS.getDuration().getSeconds(), 999999L));
+		
+		// verification
+		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
+	}
+	
+	@Test
 	void shouldNotAllowExceptionsIfNotPreviouslyOccurring() {
 		// data
 		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(9999999999L));
 		
 		// verification
 		assertEquals(0, time.getExceptions().size());
+	}
+	
+	@Test
+	void shouldAllowNullException() {
+		// data
+		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, null);
+		
+		// verication
+		assertTrue(time.getExceptions().isEmpty());
 	}
 }
