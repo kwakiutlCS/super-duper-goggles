@@ -27,16 +27,22 @@ public class ReminderAdapter {
 		entity.createdAt = metadata.getCreatedAt();
 		entity.updatedAt = metadata.getUpdatedAt();
 		
-		if (reminder.getTime() != null) {
-			entity.time = toStorage(reminder.getTime());
+		if (entity.time == null) {
+		    entity.time = toStorage(reminder.getTime());
+		} else {
+		    entity.time = toStorage(reminder.getTime(), entity.time);
 		}
 		
 		return entity;
 	}
 	
-	private static TimeEntity toStorage(Time time) {
-		TimeEntity entity = new TimeEntity();
-		
+	private static TimeEntity toStorage(Time time)  {
+	    return toStorage(time, new TimeEntity());
+	}
+	
+	private static TimeEntity toStorage(Time time, TimeEntity entity) {
+	    if (time == null) return null;
+	    
 		if (time instanceof FixedTime f) {
 			entity.time = f.getTime();
 		} else if (time instanceof DailyRepetion d) {

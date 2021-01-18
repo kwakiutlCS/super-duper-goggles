@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
@@ -30,6 +31,7 @@ public class ReminderService {
 		this.clock = clock;
 	}
 
+	@Transactional
 	public Reminder createReminder(@Valid Reminder reminder) {
 		ReminderEntity entity = ReminderAdapter.toStorage(reminder, new Metadata(clock.instant().getEpochSecond()));
 		reminderRepository.persist(entity);
@@ -50,6 +52,7 @@ public class ReminderService {
 				                 .map(ReminderAdapter::fromStorage);
 	}
 
+	@Transactional
 	public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
 		Optional<ReminderEntity> entity = reminderRepository.findByIdOptional(reminder.getId())
 				                                  .filter(r -> r.userId.equals(reminder.getUser()))
@@ -57,18 +60,15 @@ public class ReminderService {
 														                              new Metadata(e.createdAt, clock.instant().getEpochSecond()),
 														                              e));
 		
-		entity.ifPresent(reminderRepository::persist);
-		
 		return entity.map(ReminderAdapter::fromStorage);
 	}
 
+	@Transactional
 	public boolean deleteReminder(long id, String user) {
-		Optional<ReminderEntity> reminder = reminderRepository.findByIdOptional(id)
-		                                                      .filter(r -> r.userId.equals(user));
-		
-		reminder.ifPresent(r -> reminderRepository.deleteById(r.id));
-		
-		return reminder.isPresent();
+		return reminderRepository.findByIdOptional(id)
+		                         .filter(r -> r.userId.equals(user))
+		                         .map(r -> reminderRepository.deleteById(r.id))
+		                         .orElse(false);
 	}
 
 	public List<Long> getSchedule(long id, String user, List<Long> interval, Long limit) {

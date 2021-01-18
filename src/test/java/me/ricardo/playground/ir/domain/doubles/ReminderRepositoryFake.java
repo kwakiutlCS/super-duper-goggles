@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.domain.mocks;
+package me.ricardo.playground.ir.domain.doubles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,17 +32,17 @@ public class ReminderRepositoryFake extends ReminderRepository {
 		return Optional.ofNullable(reminders.get(id));
 	}
 	
-	public long deleteUserReminderById(long id, String user) {
-		ReminderEntity reminder = reminders.get(id);
-		if (reminder != null && user.equals(reminder.userId)) {
-			reminders.remove(id);
-			return 1;
-		}
-		
-		return 0;
-	}
-	
 	public boolean deleteById(Long id) {
 		return reminders.remove(id) != null;
+	}
+	
+    public static ReminderRepository getNoDelete() {
+    	return new NoDeleteRepository();
+    }
+    
+	static class NoDeleteRepository extends ReminderRepositoryFake {
+		public boolean deleteById(Long id) {
+			return false;
+		}
 	}
 }

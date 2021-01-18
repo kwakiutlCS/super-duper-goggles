@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
@@ -24,7 +25,7 @@ public class TimeEntity extends PanacheEntity {
 	
 	public Long boundValue;
 	
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(name="Exception")
 	public Set<Long> exceptions;
 }

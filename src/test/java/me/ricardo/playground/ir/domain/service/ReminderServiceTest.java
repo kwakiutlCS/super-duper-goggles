@@ -1,7 +1,9 @@
 package me.ricardo.playground.ir.domain.service;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
@@ -17,13 +19,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
-import me.ricardo.playground.ir.domain.mocks.ReminderRepositoryFake;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
+import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 class ReminderServiceTest {
@@ -49,9 +52,19 @@ class ReminderServiceTest {
 		entity2.createdAt = 0;
 		entity2.updatedAt = 0;
 		
+		TimeEntity timeEntity = new TimeEntity();
+		timeEntity.time = 2;
+		ReminderEntity timeReminder = new ReminderEntity();
+		timeReminder.content = "3";
+		timeReminder.userId = "user";
+		timeReminder.createdAt = 0;
+		timeReminder.updatedAt = 0;
+		timeReminder.time = timeEntity;
+		
 		repository = new ReminderRepositoryFake();
 		repository.persist(entity1);
 		repository.persist(entity2);
+		repository.persist(timeReminder);
 		
 		service = new ReminderService(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
 	}
@@ -60,7 +73,7 @@ class ReminderServiceTest {
 	class FindReminders {
 		@Test
 		void shouldFindAllReminders() {
-			assertEquals(2, service.getReminders("user").size());
+			assertEquals(3, service.getReminders("user").size());
 		}
 
 		@Test
@@ -103,7 +116,7 @@ class ReminderServiceTest {
 			Reminder result = service.createReminder(reminder);
 
 			// verification
-			assertEquals(3L, result.getId());
+			assertEquals(4L, result.getId());
 			assertEquals(TIMESTAMP, result.getMetadata().getCreatedAt());
 			assertEquals(TIMESTAMP, result.getMetadata().getUpdatedAt());
 		}
@@ -218,6 +231,30 @@ class ReminderServiceTest {
 			// verification
 			assertFalse(validator.validateParameters(service, ReminderService.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{reminder}).isEmpty());
 		}
+		
+		@Test
+		void shouldAllowRemoveTimeInformation() {
+		    // data
+            Reminder reminder = Reminder.Builder.start().withId(3L).withUser("user").build();
+            
+            // action
+            Optional<Reminder> result = service.updateReminder(reminder);
+            
+            // verification
+            assertNull(result.get().getTime());
+		}
+		
+		@Test
+        void shouldAllowAddingTimeInformation() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").withTime(new FixedTime(3L)).build();
+            
+            // action
+            Optional<Reminder> result = service.updateReminder(reminder);
+            
+            // verification
+            assertNotNull(result.get().getTime());
+        }
 	}
 	
 	
@@ -259,6 +296,20 @@ class ReminderServiceTest {
 			// action
 			boolean result = service.deleteReminder(999L, "user");
 
+			// verification
+			assertEquals(false, result);
+		}
+		
+		@Test
+		void shouldReturnResultFromDeletionOperation() {
+			// data
+			ReminderService service = new ReminderService(ReminderRepositoryFake.getNoDelete(), Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
+			Reminder reminder = Reminder.Builder.start().withUser("user").build();
+			service.createReminder(reminder);
+			
+			// action
+			boolean result = service.deleteReminder(1L, "user");
+			
 			// verification
 			assertEquals(false, result);
 		}
