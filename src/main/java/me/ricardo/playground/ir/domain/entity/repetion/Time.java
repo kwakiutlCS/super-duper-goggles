@@ -7,4 +7,6 @@ public sealed interface Time permits FixedTime, DailyRepetion {
 	Stream<Long> schedule();
 
 	Stream<Long> schedule(long start);
+
+    boolean addException(long exception);
 }

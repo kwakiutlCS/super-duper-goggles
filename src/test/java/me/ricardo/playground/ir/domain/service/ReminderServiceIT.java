@@ -3,10 +3,12 @@ package me.ricardo.playground.ir.domain.service;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.HeuristicMixedException;
@@ -33,6 +35,9 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 class ReminderServiceIT {
 
 	private static final String DEFAULT_USER = "default_user";
+	
+	@Inject
+	ReminderCrud crud;
 	
 	@Inject
 	ReminderService service;
@@ -105,7 +110,7 @@ class ReminderServiceIT {
 		Reminder reminder = Reminder.Builder.start().withUser(DEFAULT_USER).build();
 		
 		// action
-		Reminder result = service.createReminder(reminder);
+		Reminder result = crud.createReminder(reminder);
 		
 		// verification
 		long id = repository.listAll().stream().mapToLong(e -> e.id).max().getAsLong();
@@ -119,8 +124,8 @@ class ReminderServiceIT {
 		long count = ReminderEntity.count();
 		
 		// action
-		List<Reminder> userReminders = service.getReminders(DEFAULT_USER);
-		List<Reminder> otherUserReminders = service.getReminders("otherUser");
+		List<Reminder> userReminders = crud.getReminders(DEFAULT_USER);
+		List<Reminder> otherUserReminders = crud.getReminders("otherUser");
 		
 		// verification
 		assertEquals(count, userReminders.size());
@@ -130,8 +135,8 @@ class ReminderServiceIT {
 	@Test
 	void shouldFindReminderById() {
 		// action
-		Optional<Reminder> userReminder = service.getReminder(1L, DEFAULT_USER);
-		Optional<Reminder> otherUserReminder = service.getReminder(1L, "otherUser");
+		Optional<Reminder> userReminder = crud.getReminder(1L, DEFAULT_USER);
+		Optional<Reminder> otherUserReminder = crud.getReminder(1L, "otherUser");
 		
 		// verification
 		assertEquals(1L, userReminder.get().getId());
@@ -144,7 +149,7 @@ class ReminderServiceIT {
 		Reminder reminder = Reminder.Builder.start().withContent("updated").withId(1L).withUser(DEFAULT_USER).build();
 		
 		//action
-		service.updateReminder(reminder);
+		crud.updateReminder(reminder);
 		
 		// verification
 		tm.begin();
@@ -160,7 +165,7 @@ class ReminderServiceIT {
         Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withUser(DEFAULT_USER).build();
         
         //action
-        Reminder result = service.updateReminder(reminder).get();
+        Reminder result = crud.updateReminder(reminder).get();
         
         // verification
         tm.begin();
@@ -177,7 +182,7 @@ class ReminderServiceIT {
         Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withTime(new FixedTime(4L)).withUser(DEFAULT_USER).build();
         
         //action
-        Reminder result = service.updateReminder(reminder).get();
+        Reminder result = crud.updateReminder(reminder).get();
         
         // verification
         tm.begin();
@@ -193,7 +198,7 @@ class ReminderServiceIT {
 		long count = ReminderEntity.count();
 		
 		// action
-		service.deleteReminder(id, DEFAULT_USER);
+		crud.deleteReminder(id, DEFAULT_USER);
 		
 		// verification
 		assertEquals(count-1, ReminderEntity.count());
@@ -201,14 +206,30 @@ class ReminderServiceIT {
 	
 	@Test
 	void shouldRemoveOrphanEntitiesWhenDeleting() {
-		// data
+        // data
 		long timeCount = TimeEntity.count();
 	    long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).max().getAsLong();
 		
 		// action
-		service.deleteReminder(id, DEFAULT_USER);
+		crud.deleteReminder(id, DEFAULT_USER);
 		
 		// verification
 		assertEquals(timeCount-1, TimeEntity.count());
+	}
+	
+	@Test
+	void shouldAddException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+	    // data
+        long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).max().getAsLong();
+        assertEquals(Set.of(), repository.findById(id).time.exceptions);
+        
+        // action
+        boolean result = service.addException(id, DEFAULT_USER, 0L);
+        
+        // verification
+        tm.begin();
+        assertTrue(result);
+        assertEquals(Set.of(0L), repository.findById(id).time.exceptions);
+        tm.commit();
 	}
 }

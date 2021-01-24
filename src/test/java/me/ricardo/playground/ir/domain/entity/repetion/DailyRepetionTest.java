@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.domain.entity.repetion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
@@ -272,10 +274,39 @@ class DailyRepetionTest {
 	
 	@Test
 	void shouldAllowNullException() {
-		// data
+        // data
 		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, null);
 		
 		// verication
 		assertTrue(time.getExceptions().isEmpty());
+	}
+	
+	@Nested
+	class AddException {
+	    @Test
+	    void shouldAllowAddingException() {
+	        // data
+	        DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+	        
+	        // action
+	        boolean result = time.addException(60L);
+	        
+	        // verication
+	        assertTrue(result);
+	        assertEquals(Set.of(60L), time.getExceptions());
+	    }
+	    
+	    @Test
+	    void shouldNotAllowAddingInexistentExceptions() {
+	         // data
+            DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+            
+            // action
+            boolean result = time.addException(0L);
+            
+            // verication
+            assertFalse(result);
+            assertEquals(Set.of(), time.getExceptions());
+	    }
 	}
 }

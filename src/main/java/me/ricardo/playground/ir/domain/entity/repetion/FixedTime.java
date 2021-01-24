@@ -25,4 +25,9 @@ public final class FixedTime implements Time {
 	public Stream<Long> schedule(long offset) {
 		return offset > time ? Stream.empty() : schedule();
 	}
+	
+	@Override
+	public boolean addException(long exception) {
+	   return false; 
+	}
 }

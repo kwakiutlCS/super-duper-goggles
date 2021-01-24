@@ -24,8 +24,8 @@ public class ReminderAdapter {
 	public static ReminderEntity toStorage(Reminder reminder, Metadata metadata, ReminderEntity entity) {
 		entity.content = reminder.getContent();
 		entity.userId = reminder.getUser();
-		entity.createdAt = metadata.getCreatedAt();
-		entity.updatedAt = metadata.getUpdatedAt();
+		entity.createdAt = metadata.createdAt();
+		entity.updatedAt = metadata.updatedAt();
 		
 		if (entity.time == null) {
 		    entity.time = toStorage(reminder.getTime());
@@ -36,11 +36,11 @@ public class ReminderAdapter {
 		return entity;
 	}
 	
-	private static TimeEntity toStorage(Time time)  {
+	public static TimeEntity toStorage(Time time)  {
 	    return toStorage(time, new TimeEntity());
 	}
 	
-	private static TimeEntity toStorage(Time time, TimeEntity entity) {
+	public static TimeEntity toStorage(Time time, TimeEntity entity) {
 	    if (time == null) return null;
 	    
 		if (time instanceof FixedTime f) {
@@ -50,13 +50,13 @@ public class ReminderAdapter {
 			entity.unit = ChronoUnit.DAYS;
 			entity.step = d.getStep();
 			entity.zone = d.getZone().getId();
-			entity.boundType = d.getBound().getType().ordinal();
+			entity.boundType = d.getBound().type().ordinal();
 			entity.exceptions = d.getExceptions();
 			
-			if (d.getBound().getType() == BoundType.COUNT_BOUND) {
-				entity.boundValue = Long.valueOf(d.getBound().getLimit());
-			} else if (d.getBound().getType() == BoundType.TIMESTAMP_BOUND) {
-				entity.boundValue = d.getBound().getTimestamp();
+			if (d.getBound().type() == BoundType.COUNT_BOUND) {
+				entity.boundValue = Long.valueOf(d.getBound().limit());
+			} else if (d.getBound().type() == BoundType.TIMESTAMP_BOUND) {
+				entity.boundValue = d.getBound().timestamp();
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class ReminderAdapter {
 				               .build();
 	}
 
-	private static Time fromStorage(TimeEntity entity) {
+	public static Time fromStorage(TimeEntity entity) {
 		if (entity == null) {
 			return null;
 		}

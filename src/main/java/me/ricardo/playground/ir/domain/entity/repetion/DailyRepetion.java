@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +29,7 @@ public final class DailyRepetion implements Time {
 	}
 	
 	public DailyRepetion(long start, int step, Bound bound, ZoneId zone) {
-		this(start, step, bound, zone, Set.of());
+		this(start, step, bound, zone, new HashSet<>());
 	}
 	
 	public DailyRepetion(long start, int step, Bound bound, ZoneId zone, Set<Long> exceptions) {
@@ -36,7 +37,7 @@ public final class DailyRepetion implements Time {
 		this.bound = bound;
 		this.step = step;
 		this.zone = zone;
-		this.exceptions = exceptions == null ? Set.of() : filterValidExceptions(exceptions);
+		this.exceptions = exceptions == null ? new HashSet<>() : filterValidExceptions(exceptions);
 	}
 
 	public long getStart() {
@@ -58,7 +59,15 @@ public final class DailyRepetion implements Time {
 	public Set<Long> getExceptions() {
 		return exceptions;
 	}
-	
+
+    public boolean addException(long exception) {
+        if (!isExceptionValid(exception)) {
+            return false;
+        }
+        
+        return this.exceptions.add(exception); 
+    }
+    
 	@Override
 	public Stream<Long> schedule() {
 		return schedule(start);
@@ -95,12 +104,12 @@ public final class DailyRepetion implements Time {
 	
 	
 	private Stream<Long> bound(Stream<Long> schedule, long iterations) {
-		switch (bound.getType()) {
+		switch (bound.type()) {
 		case COUNT_BOUND:
-			return schedule.limit(Math.max(0, bound.getLimit() - iterations));
+			return schedule.limit(Math.max(0, bound.limit() - iterations));
 			
 		case TIMESTAMP_BOUND:
-			return schedule.takeWhile(v -> v <= bound.getTimestamp());
+			return schedule.takeWhile(v -> v <= bound.timestamp());
 			
 		case NO_BOUND:
 		default:
@@ -111,9 +120,14 @@ public final class DailyRepetion implements Time {
 	
 	private Set<Long> filterValidExceptions(Set<Long> exceptions) {
 		return exceptions.stream()
-		                 .filter(e -> scheduleBeforeExceptions(e).takeWhile(s -> s <= e)
-		        		                                         .findAny()
-		        		                                         .isPresent())
+		                 .filter(this::isExceptionValid)
 		                 .collect(Collectors.toSet());
+	}
+	
+	
+	private boolean isExceptionValid(long exception) {
+	    return scheduleBeforeExceptions(exception).takeWhile(s -> s <= exception)
+	                                              .findAny()
+	                                              .isPresent();
 	}
 }
