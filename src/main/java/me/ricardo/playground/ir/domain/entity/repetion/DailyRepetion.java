@@ -10,14 +10,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import me.ricardo.playground.ir.domain.validation.BoundConstraint;
+import me.ricardo.playground.ir.domain.validation.StartEndConsistent;
 import me.ricardo.playground.ir.utils.Utils;
 
+@StartEndConsistent
 public final class DailyRepetion implements Time {
 
+    @PositiveOrZero
 	private final long start;
 	
+	@BoundConstraint
 	private final Bound bound;
 	
+	@Positive
 	private final int step;
 	
 	private final ZoneId zone;

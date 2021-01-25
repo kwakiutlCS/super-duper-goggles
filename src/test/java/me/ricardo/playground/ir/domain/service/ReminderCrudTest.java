@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import javax.validation.Validation;
@@ -19,14 +18,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import me.ricardo.playground.ir.domain.doubles.ReminderFakes;
 import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
-import me.ricardo.playground.ir.storage.entity.ReminderEntity;
-import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 class ReminderCrudTest {
@@ -41,59 +39,20 @@ class ReminderCrudTest {
 
 	@BeforeEach
 	void init() {
-		ReminderEntity entity1 = new ReminderEntity();
-		entity1.content = "1";
-		entity1.userId = "user";
-		entity1.createdAt = 0;
-		entity1.updatedAt = 0;
-		ReminderEntity entity2 = new ReminderEntity();
-		entity2.content = "2";
-		entity2.userId = "user";
-		entity2.createdAt = 0;
-		entity2.updatedAt = 0;
-		
-		TimeEntity timeEntity = new TimeEntity();
-		timeEntity.time = 60L;
-		ReminderEntity timeReminder = new ReminderEntity();
-		timeReminder.content = "3";
-		timeReminder.userId = "user";
-		timeReminder.createdAt = 0;
-		timeReminder.updatedAt = 0;
-		timeReminder.time = timeEntity;
-		
-		TimeEntity timeEntity1 = new TimeEntity();
-		timeEntity1.time = 60L;
-		timeEntity1.step = 1;
-		timeEntity1.unit = ChronoUnit.DAYS;
-		timeEntity1.boundType = 0;
-		timeEntity1.boundValue = 1L;
-		timeEntity1.zone = "Z";
-		ReminderEntity timeReminder1 = new ReminderEntity();
-		timeReminder1.content = "3";
-		timeReminder1.userId = "user";
-		timeReminder1.createdAt = 0;
-		timeReminder1.updatedAt = 0;
-		timeReminder1.time = timeEntity1;
-		
-		repository = new ReminderRepositoryFake();
-		repository.persist(entity1);
-		repository.persist(entity2);
-		repository.persist(timeReminder);
-		repository.persist(timeReminder1);
-		
-		crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
+	    repository = new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER(), ReminderFakes.DAILY_REPETION(), ReminderFakes.FIXED_TIME());
+	    crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
 	}
 
 	@Nested
 	class FindReminders {
 		@Test
 		void shouldFindAllReminders() {
-			assertEquals(4, crud.getReminders("user").size());
+			assertEquals(3, crud.getReminders("user").size());
 		}
 
 		@Test
 		void shouldNotFindRemindersForDifferentUser() {
-			assertEquals(0, crud.getReminders("notTheUser").size());
+            assertEquals(0, crud.getReminders("notTheUser").size());
 		}
 	}
 	
@@ -131,7 +90,7 @@ class ReminderCrudTest {
 			Reminder result = crud.createReminder(reminder);
 
 			// verification
-			assertEquals(5L, result.getId());
+			assertEquals(4L, result.getId());
 			assertEquals(TIMESTAMP, result.getMetadata().createdAt());
 			assertEquals(TIMESTAMP, result.getMetadata().updatedAt());
 		}
@@ -189,6 +148,24 @@ class ReminderCrudTest {
 			// verification
 			assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
 		}
+		
+		@Test
+		void shouldNotAllowInvalidFixedTimeRemider() throws NoSuchMethodException, SecurityException {
+		    // data
+		    Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new FixedTime(-80)).build();
+		    
+		    // verification
+		    assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+		}
+		
+		@Test
+        void shouldNotAllowInvalidStepInDailyRepetionRemider() throws NoSuchMethodException, SecurityException {
+            // data
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new DailyRepetion(0, 0, Bound.none(), ZoneOffset.UTC)).build();
+            
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+        }
 	}
 	
 	@Nested

@@ -1,7 +1,9 @@
 package me.ricardo.playground.ir.domain.entity;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -10,7 +12,6 @@ import javax.validation.groups.Default;
 
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
-import java.util.Objects;
 
 public class Reminder {
 
@@ -26,6 +27,7 @@ public class Reminder {
 
 	private final Metadata metadata;
 	
+	@Valid
 	private final Time time;
 	
 	public Reminder(Long id, String user, String content, Time time, Metadata metadata) {

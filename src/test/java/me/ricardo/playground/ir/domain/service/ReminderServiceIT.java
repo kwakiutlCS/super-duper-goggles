@@ -1,11 +1,13 @@
 package me.ricardo.playground.ir.domain.service;
 
+import static me.ricardo.playground.ir.domain.doubles.ReminderFakes.DAILY_REPETION;
+import static me.ricardo.playground.ir.domain.doubles.ReminderFakes.FIXED_TIME;
+import static me.ricardo.playground.ir.domain.doubles.ReminderFakes.SIMPLE_REMINDER;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,8 +36,8 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 @QuarkusTestResource(value = PostgresqlResource.class)
 class ReminderServiceIT {
 
-	private static final String DEFAULT_USER = "default_user";
-	
+    private static List<ReminderEntity> REMINDERS = List.of(SIMPLE_REMINDER(), DAILY_REPETION(), DAILY_REPETION(),  DAILY_REPETION(), DAILY_REPETION(), FIXED_TIME());
+    
 	@Inject
 	ReminderCrud crud;
 	
@@ -51,63 +53,16 @@ class ReminderServiceIT {
 	@BeforeAll
 	@Transactional
 	static void init() {
-		ReminderEntity reminder1 = new ReminderEntity();
-		reminder1.content = "reminder1";
-		reminder1.userId = DEFAULT_USER;
-		
-		ReminderEntity reminder2 = new ReminderEntity();
-		reminder2.content = "reminder1";
-		reminder2.userId = DEFAULT_USER;
-	
-        reminder1.persist();
-        reminder2.persist();
-        
-        TimeEntity time1 = new TimeEntity();
-		time1.unit = ChronoUnit.DAYS;
-		time1.step = 1;
-		time1.time = 0;
-		time1.boundType = 1;
-		time1.boundValue = 1L;
-		time1.zone = "Z";
-		
-		ReminderEntity timeReminder1 = new ReminderEntity();
-		timeReminder1.userId = DEFAULT_USER;
-		timeReminder1.time = time1;
-		
-		TimeEntity time2 = new TimeEntity();
-        time2.unit = ChronoUnit.DAYS;
-        time2.step = 1;
-        time2.time = 0;
-        time2.boundType = 1;
-        time2.boundValue = 1L;
-        time2.zone = "Z";
-        
-        ReminderEntity timeReminder2 = new ReminderEntity();
-        timeReminder2.userId = DEFAULT_USER;
-        timeReminder2.time = time2;
-        
-        TimeEntity time3 = new TimeEntity();
-        time3.unit = ChronoUnit.DAYS;
-        time3.step = 1;
-        time3.time = 0;
-        time3.boundType = 1;
-        time3.boundValue = 1L;
-        time3.zone = "Z";
-        
-        ReminderEntity timeReminder3 = new ReminderEntity();
-        timeReminder3.userId = DEFAULT_USER;
-        timeReminder3.time = time3;
-        
-        timeReminder1.persist();
-		timeReminder2.persist();
-		timeReminder3.persist();
+	    for (ReminderEntity reminder : REMINDERS) {
+	        reminder.persist();
+	    }
 	}
 	
 	@Test
 	void shouldCreateReminder() {
 		// data
 		long count = repository.count();
-		Reminder reminder = Reminder.Builder.start().withUser(DEFAULT_USER).build();
+		Reminder reminder = Reminder.Builder.start().withUser("user").build();
 		
 		// action
 		Reminder result = crud.createReminder(reminder);
@@ -124,7 +79,7 @@ class ReminderServiceIT {
 		long count = ReminderEntity.count();
 		
 		// action
-		List<Reminder> userReminders = crud.getReminders(DEFAULT_USER);
+		List<Reminder> userReminders = crud.getReminders("user");
 		List<Reminder> otherUserReminders = crud.getReminders("otherUser");
 		
 		// verification
@@ -135,7 +90,7 @@ class ReminderServiceIT {
 	@Test
 	void shouldFindReminderById() {
 		// action
-		Optional<Reminder> userReminder = crud.getReminder(1L, DEFAULT_USER);
+		Optional<Reminder> userReminder = crud.getReminder(1L, "user");
 		Optional<Reminder> otherUserReminder = crud.getReminder(1L, "otherUser");
 		
 		// verification
@@ -146,7 +101,7 @@ class ReminderServiceIT {
 	@Test
 	void shouldUpdateReminder() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
 		// data
-		Reminder reminder = Reminder.Builder.start().withContent("updated").withId(1L).withUser(DEFAULT_USER).build();
+		Reminder reminder = Reminder.Builder.start().withContent("updated").withId(1L).withUser("user").build();
 		
 		//action
 		crud.updateReminder(reminder);
@@ -161,8 +116,8 @@ class ReminderServiceIT {
     void shouldRemoveOrphanEntitiesWhenUpdating() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
         // data
 	    long timeCount = TimeEntity.count();
-        long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).min().getAsLong();
-        Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withUser(DEFAULT_USER).build();
+        long id = REMINDERS.get(1).id;
+        Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withUser("user").build();
         
         //action
         Reminder result = crud.updateReminder(reminder).get();
@@ -177,9 +132,9 @@ class ReminderServiceIT {
 	@Test
     void shouldUpdateChildEntity() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
         // data
-        long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).max().getAsLong();
+        long id = REMINDERS.get(5).id; 
         long childId = repository.findById(id).time.id;
-        Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withTime(new FixedTime(4L)).withUser(DEFAULT_USER).build();
+        Reminder reminder = Reminder.Builder.start().withContent("updated").withId(id).withTime(new FixedTime(4L)).withUser("user").build();
         
         //action
         Reminder result = crud.updateReminder(reminder).get();
@@ -194,11 +149,11 @@ class ReminderServiceIT {
 	@Test
 	void shouldDeleteReminder() {
 		// data
-		long id = repository.listAll().stream().filter(r -> r.time == null).mapToLong(e -> e.id).max().getAsLong();
+		long id = REMINDERS.get(5).id;
 		long count = ReminderEntity.count();
 		
 		// action
-		crud.deleteReminder(id, DEFAULT_USER);
+		crud.deleteReminder(id, "user");
 		
 		// verification
 		assertEquals(count-1, ReminderEntity.count());
@@ -208,10 +163,9 @@ class ReminderServiceIT {
 	void shouldRemoveOrphanEntitiesWhenDeleting() {
         // data
 		long timeCount = TimeEntity.count();
-	    long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).max().getAsLong();
-		
+	    long id = REMINDERS.get(3).id;		
 		// action
-		crud.deleteReminder(id, DEFAULT_USER);
+		crud.deleteReminder(id, "user");
 		
 		// verification
 		assertEquals(timeCount-1, TimeEntity.count());
@@ -220,16 +174,16 @@ class ReminderServiceIT {
 	@Test
 	void shouldAddException() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
 	    // data
-        long id = repository.listAll().stream().filter(r -> r.time != null).mapToLong(e -> e.id).max().getAsLong();
+        long id = REMINDERS.get(2).id;
         assertEquals(Set.of(), repository.findById(id).time.exceptions);
         
         // action
-        boolean result = service.addException(id, DEFAULT_USER, 0L);
+        boolean result = service.addException(id, "user", 60L);
         
         // verification
         tm.begin();
         assertTrue(result);
-        assertEquals(Set.of(0L), repository.findById(id).time.exceptions);
+        assertEquals(Set.of(60L), repository.findById(id).time.exceptions);
         tm.commit();
 	}
 }

@@ -2,10 +2,13 @@ package me.ricardo.playground.ir.domain.entity.repetion;
 
 import java.util.stream.Stream;
 
+import javax.validation.constraints.PositiveOrZero;
+
 import me.ricardo.playground.ir.utils.Utils;
 
 public final class FixedTime implements Time {
 
+    @PositiveOrZero
 	private final long time;
 	
 	public FixedTime(long time) {

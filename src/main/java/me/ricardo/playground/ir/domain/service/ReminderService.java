@@ -56,12 +56,12 @@ public class ReminderService {
         TimeEntity entity = entityOptional.get();
         
         Time time = ReminderAdapter.fromStorage(entity);
-        boolean result = time.addException(exception);
+        boolean isExceptionAdded = time.addException(exception);
         
-        if (result) {
+        if (isExceptionAdded) {
             ReminderAdapter.toStorage(time, entity);
         }
         
-        return result;
+        return isExceptionAdded;
     }
 }

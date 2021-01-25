@@ -5,13 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 
 class FixedTimeTest {
 
 	private static final long TIMESTAMP = 1020L;
+	
+	private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 	@Test
 	void shouldHaveOneElementSchedule() {
@@ -67,4 +75,14 @@ class FixedTimeTest {
 		Reminder r4 = builder.withTime(new FixedTime(120)).build();
 		assertEquals(120, r4.schedule().collect(Collectors.toList()).get(0));
 	}
+	
+	@Nested
+    class AddStart {
+        @ParameterizedTest
+        @ValueSource(longs = {-60, -1})
+        void shouldNotAllowNegativeTime(long time) {
+            // verification
+            assertEquals(1, validator.validateValue(FixedTime.class, "time", time).size());
+        }
+    }
 }

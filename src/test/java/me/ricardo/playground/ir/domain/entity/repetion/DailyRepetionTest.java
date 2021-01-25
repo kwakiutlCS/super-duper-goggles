@@ -11,16 +11,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
 
 class DailyRepetionTest {
 
 	private static final long TIMESTAMP = 1020L;
 	
 	private static final long DAY = 86400;
+	
+	private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 	@Test
 	void shouldHaveUnboundedOneDayRepetion() {
@@ -309,4 +317,58 @@ class DailyRepetionTest {
             assertEquals(Set.of(), time.getExceptions());
 	    }
 	}
+	
+	@Nested
+	class AddBounding {
+	    @ParameterizedTest
+	    @ValueSource(longs = {0, -1, -10})
+	    void shouldNotAllowNonPositiveLimitBound(long limit) {
+	        // verification
+	        assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", Bound.count(limit)).size());
+	    }
+	    
+	    @ParameterizedTest
+        @ValueSource(longs = {0, -1, -10})
+        void shouldNotAllowNonPositiveTimestampBound(long timestamp) {
+            // verification
+            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", Bound.timestamp(timestamp)).size());
+        }
+	    
+	    @Test
+        void shouldNotAllowValuesForNoBound() {
+            // verification
+            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", new Bound(BoundType.NO_BOUND, 0, 1)).size());
+            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", new Bound(BoundType.NO_BOUND, 1, 0)).size());
+        }
+	    
+	    @ParameterizedTest
+        @ValueSource(longs = {3600, 3000})
+        void shouldNotAllowBoundTimestampSmallerOrEqualThanStart(long timestamp) {
+	        // data
+	        DailyRepetion time = new DailyRepetion(3600L, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
+	        
+            // verification
+            assertEquals(1, validator.validate(time).size());
+        }
+	}
+	
+	@Nested
+	class AddStart {
+	    @ParameterizedTest
+        @ValueSource(longs = {-60, -1})
+        void shouldNotAllowNegativeStart(long start) {
+            // verification
+            assertEquals(1, validator.validateValue(DailyRepetion.class, "start", start).size());
+        }
+	}
+	
+	@Nested
+    class AddStep {
+	    @ParameterizedTest
+        @ValueSource(ints = {0, -1, -10})
+        void shouldNotAllowNonPositiveStep(int step) {
+            // verification
+            assertEquals(1, validator.validateValue(DailyRepetion.class, "step", step).size());
+        }
+    }
 }

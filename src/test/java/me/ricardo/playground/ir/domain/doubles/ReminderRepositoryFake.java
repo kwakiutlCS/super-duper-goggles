@@ -14,6 +14,16 @@ public class ReminderRepositoryFake extends ReminderRepository {
 	
 	private long next_id = 1L;
 	
+	public ReminderRepositoryFake() {
+	    
+	}
+	
+	public ReminderRepositoryFake(ReminderEntity... reminders) {
+	    for (ReminderEntity reminder : reminders) {
+	        persist(reminder);
+	    }
+	}
+	
 	public List<ReminderEntity> findByUser(String user) {
 		return reminders.values().stream()
 				                 .filter(r -> user.equals(r.userId))
