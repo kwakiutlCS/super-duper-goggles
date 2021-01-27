@@ -12,42 +12,30 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
-import me.ricardo.playground.ir.domain.validation.BoundConstraint.BoundValidator;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
+import me.ricardo.playground.ir.domain.validation.Bounded.BoundValidator;
 
 @Documented
 @Constraint(validatedBy = BoundValidator.class)
 @Target( { ElementType.FIELD, ElementType.TYPE, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BoundConstraint {
+public @interface Bounded {
     
-    String message() default "field is invalid";
+    String message() default "field must have a bound";
     
     Class<?>[] groups() default {};
     
     Class<? extends Payload>[] payload() default {};
     
     
-    class BoundValidator implements ConstraintValidator<BoundConstraint, Bound> {
+    class BoundValidator implements ConstraintValidator<Bounded, Bound> {
         
         @Override
         public boolean isValid(final Bound value, final ConstraintValidatorContext context) {
         	boolean valid = true;
         	
         	if (value != null) {
-        	    switch(value.type()) {
-        	    case COUNT_BOUND:
-        	        valid = value.limit() > 0 && value.timestamp() == 0;
-        	        break;
-        	    case NO_BOUND:
-        	        valid = value.limit() == 0 && value.timestamp() == 0;
-        	        break;
-        	    case TIMESTAMP_BOUND:
-        	        valid = value.limit() == 0 && value.timestamp() > 0;
-        	        break;
-        	    default:
-        	        break;
-
-        	    }
+        	   valid = value.type() != BoundType.NO_BOUND; 
         	}
         	
         	return valid;

@@ -9,6 +9,7 @@ import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
@@ -41,8 +42,6 @@ public class ReminderAdapter {
 	}
 	
 	public static TimeEntity toStorage(Time time, TimeEntity entity) {
-	    if (time == null) return null;
-	    
 		if (time instanceof FixedTime f) {
 			entity.time = f.getTime();
 		} else if (time instanceof DailyRepetion d) {
@@ -58,6 +57,8 @@ public class ReminderAdapter {
 			} else if (d.getBound().type() == BoundType.TIMESTAMP_BOUND) {
 				entity.boundValue = d.getBound().timestamp();
 			}
+		} else {
+		    entity = null;
 		}
 		
 		return entity;
@@ -75,7 +76,7 @@ public class ReminderAdapter {
 
 	public static Time fromStorage(TimeEntity entity) {
 		if (entity == null) {
-			return null;
+			return NoTime.INSTANCE;
 		}
 		
 		if (entity.unit == null) {

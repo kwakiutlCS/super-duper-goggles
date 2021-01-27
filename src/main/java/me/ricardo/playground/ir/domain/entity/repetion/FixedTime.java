@@ -33,4 +33,13 @@ public final class FixedTime implements Time {
 	public boolean addException(long exception) {
 	   return false; 
 	}
+	
+	@Override
+	public Time truncate(long timestamp) {
+	    if (timestamp <= time) {
+	        return NoTime.INSTANCE;
+	    }
+	    
+	    return this;
+	}
 }

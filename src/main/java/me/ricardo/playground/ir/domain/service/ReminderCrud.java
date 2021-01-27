@@ -54,13 +54,12 @@ public class ReminderCrud {
 
 	@Transactional
 	public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
-		Optional<ReminderEntity> entity = reminderRepository.findByIdOptional(reminder.getId())
-				                                            .filter(r -> r.userId.equals(reminder.getUser()))
-												            .map(e -> ReminderAdapter.toStorage(reminder,
-														                                        new Metadata(e.createdAt, clock.instant().getEpochSecond()),
-														                                        e));
-		
-		return entity.map(ReminderAdapter::fromStorage);
+		return reminderRepository.findByIdOptional(reminder.getId())
+                                 .filter(r -> r.userId.equals(reminder.getUser()))
+                                 .map(e -> ReminderAdapter.toStorage(reminder,
+                                                                     new Metadata(e.createdAt, clock.instant().getEpochSecond()),
+                                                                     e))
+                                 .map(ReminderAdapter::fromStorage);
 	}
 
 	@Transactional

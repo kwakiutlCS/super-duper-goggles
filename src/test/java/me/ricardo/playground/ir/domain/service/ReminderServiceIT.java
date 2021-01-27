@@ -5,12 +5,13 @@ import static me.ricardo.playground.ir.domain.doubles.ReminderFakes.FIXED_TIME;
 import static me.ricardo.playground.ir.domain.doubles.ReminderFakes.SIMPLE_REMINDER;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.transaction.HeuristicMixedException;
@@ -26,8 +27,11 @@ import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
@@ -36,7 +40,7 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 @QuarkusTestResource(value = PostgresqlResource.class)
 class ReminderServiceIT {
 
-    private static List<ReminderEntity> REMINDERS = List.of(SIMPLE_REMINDER(), DAILY_REPETION(), DAILY_REPETION(),  DAILY_REPETION(), DAILY_REPETION(), FIXED_TIME());
+    private static List<ReminderEntity> REMINDERS = List.of(SIMPLE_REMINDER(), DAILY_REPETION(), DAILY_REPETION(),  DAILY_REPETION(), DAILY_REPETION(), FIXED_TIME(), DAILY_REPETION());
     
 	@Inject
 	ReminderCrud crud;
@@ -124,7 +128,7 @@ class ReminderServiceIT {
         
         // verification
         tm.begin();
-        assertNull(result.getTime());
+        assertEquals(NoTime.INSTANCE, result.getTime());
         assertEquals(timeCount-1, TimeEntity.count());
         tm.commit();
     }
@@ -141,7 +145,7 @@ class ReminderServiceIT {
         
         // verification
         tm.begin();
-        assertNotNull(result.getTime());
+        assertNotEquals(NoTime.INSTANCE, result.getTime());
         assertEquals(childId, repository.findById(id).time.id);
         tm.commit();
     }
@@ -164,7 +168,8 @@ class ReminderServiceIT {
         // data
 		long timeCount = TimeEntity.count();
 	    long id = REMINDERS.get(3).id;		
-		// action
+		
+	    // action
 		crud.deleteReminder(id, "user");
 		
 		// verification
@@ -186,4 +191,38 @@ class ReminderServiceIT {
         assertEquals(Set.of(60L), repository.findById(id).time.exceptions);
         tm.commit();
 	}
+	
+	@Test
+	void shouldTruncateReminder() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+	    // data
+	    long id = REMINDERS.get(6).id;
+	    long timestamp = REMINDERS.get(6).time.time;
+	    assertEquals(List.of(timestamp, timestamp + 86400), service.getSchedule(id, "user", timestamp, Bound.count(2)));
+	    
+	    // action
+	    Optional<Reminder> result = service.truncate(id, "user", timestamp + 1);
+	    
+	    // verification
+	    tm.begin();
+	    assertEquals(List.of(timestamp), ReminderAdapter.fromStorage(repository.findById(id)).getTime().schedule().limit(2).collect(Collectors.toList()));
+	    assertEquals(List.of(timestamp), result.get().getTime().schedule().limit(2).collect(Collectors.toList()));
+	    tm.commit();
+	}
+	
+	@Test
+    void shouldDeleteTruncateReminderIfNoSchedulingRemains() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+        // data
+        long id = REMINDERS.get(6).id;
+        long timestamp = REMINDERS.get(6).time.time;
+        assertEquals(List.of(timestamp), service.getSchedule(id, "user", timestamp, Bound.count(1)));
+        
+        // action
+        Optional<Reminder> result = service.truncate(id, "user", timestamp);
+        
+        // verification
+        tm.begin();
+        assertNull(repository.findById(id));
+        assertEquals(Optional.empty(), result);
+        tm.commit();
+    }
 }

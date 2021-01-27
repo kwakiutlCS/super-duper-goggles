@@ -7,18 +7,25 @@ import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
+import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.validation.BoundConstraint;
+import me.ricardo.playground.ir.domain.validation.Bounded;
+import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 @Dependent
 public class ReminderService {
+    
+    public final ReminderCrud crud;
 
-	private ReminderRepository reminderRepository;
-	
-	private ReminderCrud crud;
+	private final ReminderRepository reminderRepository;
 	
 	public ReminderService(ReminderRepository reminderRepository, ReminderCrud crud) {
 		this.reminderRepository = reminderRepository;
@@ -26,25 +33,16 @@ public class ReminderService {
 	}
 
 	
-	public List<Long> getSchedule(long id, String user, List<Long> interval, Long limit) {
-		if (interval == null || interval.isEmpty()) {
-			return List.of();
-		}
-		
-		Stream<Long> schedule = crud.getReminder(id, user).map(r -> r.schedule(interval.get(0)))
-				                                          .orElse(Stream.empty());
-		
-		if (interval.size() == 2) {
-			schedule = schedule.takeWhile(s -> s < interval.get(1));
-		}
-		
-		if (limit != null) {
-			schedule = schedule.limit(limit);
-		}
-		
-		return schedule.collect(Collectors.toList());
+	public List<Long> getSchedule(long id, String user, long start, @NotNull @BoundConstraint @Bounded Bound bound) {
+		return crud.getReminder(id, user)
+		           .map(Reminder::getTime)
+		           .map(t -> t.schedule(start))
+		           .map(bound::apply)
+		           .orElse(Stream.empty())
+		           .collect(Collectors.toList());
 	}
 
+	
 	@Transactional
     public boolean addException(long id, String user, long exception) {
         Optional<TimeEntity> entityOptional = reminderRepository.findByIdOptional(id)
@@ -63,5 +61,33 @@ public class ReminderService {
         }
         
         return isExceptionAdded;
+    }
+
+
+	@Transactional
+    public Optional<Reminder> truncate(long id, String user, long timestamp) {
+        Optional<ReminderEntity> reminderEntity = reminderRepository.findByIdOptional(id)
+                                                                    .filter(e -> e.userId.equals(user));
+        
+        Optional<Reminder> reminder = reminderEntity.map(ReminderAdapter::fromStorage);
+        
+        Time time = reminder.map(Reminder::getTime)
+                            .orElse(NoTime.INSTANCE);
+        
+        if (time == NoTime.INSTANCE) {
+            return reminder;
+        }
+        
+        Time truncated = time.truncate(timestamp);
+        
+        if (truncated == NoTime.INSTANCE) {
+            reminder = Optional.empty();
+            crud.deleteReminder(id, user);
+        } else {
+            reminder = Optional.of(Reminder.Builder.start(reminder.orElseThrow()).withTime(truncated).build());
+            ReminderAdapter.toStorage(truncated, reminderEntity.map(r -> r.time).orElseThrow());
+        }
+        
+        return reminder;
     }
 }

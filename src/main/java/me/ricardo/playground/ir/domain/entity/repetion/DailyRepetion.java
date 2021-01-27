@@ -86,8 +86,15 @@ public final class DailyRepetion implements Time {
 	public Stream<Long> schedule(long offset) {
 		return scheduleBeforeExceptions(offset).filter(s -> !exceptions.contains(s));
 	}
-	
-	
+
+    @Override
+    public Time truncate(long timestamp) {
+        if (timestamp <= start)
+            return NoTime.INSTANCE;
+        
+        return new DailyRepetion(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
+    }	
+    
 	private Stream<Long> scheduleBeforeExceptions(long offset) {
 		var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
@@ -98,7 +105,7 @@ public final class DailyRepetion implements Time {
 		var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
 			     	 	     		.map(ZonedDateTime::toEpochSecond);
 		
-		return bound(noBoundSchedule, iterations);
+		return bound.apply(noBoundSchedule, iterations);
 	}
 	
 	
@@ -111,22 +118,7 @@ public final class DailyRepetion implements Time {
 		return fullIterations + partialIterations;
 	}
 	
-	
-	private Stream<Long> bound(Stream<Long> schedule, long iterations) {
-		switch (bound.type()) {
-		case COUNT_BOUND:
-			return schedule.limit(Math.max(0, bound.limit() - iterations));
-			
-		case TIMESTAMP_BOUND:
-			return schedule.takeWhile(v -> v <= bound.timestamp());
-			
-		case NO_BOUND:
-		default:
-			return schedule;
-		}
-	}
-	
-	
+		
 	private Set<Long> filterValidExceptions(Set<Long> exceptions) {
 		return exceptions.stream()
 		                 .filter(this::isExceptionValid)

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 
 class ReminderTest {
@@ -26,7 +27,7 @@ class ReminderTest {
 		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
 		// verification
-		assertEquals(Optional.empty(), reminder.schedule().findAny());
+		assertEquals(Optional.empty(), reminder.getTime().schedule().findAny());
 	}
 	
 	@Test
@@ -35,7 +36,7 @@ class ReminderTest {
 		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
 		// verification
-		assertEquals(Optional.empty(), reminder.schedule(0L).findAny());
+		assertEquals(Optional.empty(), reminder.getTime().schedule(0L).findAny());
 	}
 	
 	@Test
@@ -119,5 +120,14 @@ class ReminderTest {
 		assertEquals(reminder1, reminder2);
 		assertNotEquals(reminder1, reminder3);
 		assertEquals(reminder4, reminder5);
+	}
+	
+	@Test
+	void shouldNotCreateNullTimeReminder() {
+	    // data
+	    Reminder reminder = Reminder.Builder.start().build();
+	    
+	    // verification
+	    assertEquals(NoTime.INSTANCE, reminder.getTime());
 	}
 }

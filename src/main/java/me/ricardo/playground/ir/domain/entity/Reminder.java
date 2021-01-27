@@ -1,7 +1,6 @@
 package me.ricardo.playground.ir.domain.entity;
 
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -10,6 +9,7 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Positive;
 import javax.validation.groups.Default;
 
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 
@@ -34,7 +34,7 @@ public class Reminder {
 		this.id = id;
 		this.user = user;
 		this.content = content;
-		this.time = time;
+		this.time = time == null ? NoTime.INSTANCE : time;
 		this.metadata = metadata;
 	}
 
@@ -56,14 +56,6 @@ public class Reminder {
 	
 	public Time getTime() {
 		return time;
-	}
-
-	public Stream<Long> schedule() {
-		return time == null ? Stream.empty() : time.schedule();
-	}
-	
-	public Stream<Long> schedule(long start) {
-		return time == null ? Stream.empty() : time.schedule(start);
 	}
 
 	@Override
@@ -96,6 +88,17 @@ public class Reminder {
 		
 		public static Builder start() {
 			return new Builder();
+		}
+		
+		public static Builder start(Reminder reminder) {
+		    Builder builder = new Builder();
+		    builder.id = reminder.id;
+		    builder.user = reminder.user;
+		    builder.content = reminder.content;
+		    builder.metadata = reminder.metadata;
+		    builder.time = reminder.time;
+		    
+		    return builder;
 		}
 		
 		public Reminder build() {

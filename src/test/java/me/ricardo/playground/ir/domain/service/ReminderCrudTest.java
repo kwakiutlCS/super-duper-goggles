@@ -1,6 +1,5 @@
 package me.ricardo.playground.ir.domain.service;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,6 +23,7 @@ import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
@@ -233,7 +233,7 @@ class ReminderCrudTest {
             Optional<Reminder> result = crud.updateReminder(reminder);
             
             // verification
-            assertNull(result.get().getTime());
+            assertEquals(NoTime.INSTANCE, result.get().getTime());
 		}
 		
 		@Test

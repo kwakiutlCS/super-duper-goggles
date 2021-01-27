@@ -1,5 +1,7 @@
 package me.ricardo.playground.ir.domain.entity.repetion;
 
+import java.util.stream.Stream;
+
 public record Bound(BoundType type, long limit, long timestamp) {
 
 	public enum BoundType {
@@ -16,5 +18,23 @@ public record Bound(BoundType type, long limit, long timestamp) {
 	
 	public static Bound count(long limit) {
 		return new Bound(BoundType.COUNT_BOUND, limit, 0);
+	}
+	
+	public Stream<Long> apply(Stream<Long> schedule) {
+	    return apply(schedule, 0);
+	}
+	
+	public Stream<Long> apply(Stream<Long> schedule, long iterations) {
+	    switch (type) {
+        case COUNT_BOUND:
+            return schedule.limit(Math.max(0, limit-iterations));
+        
+        case TIMESTAMP_BOUND:
+            return schedule.takeWhile(s -> s <= timestamp);
+            
+        case NO_BOUND:
+        default:
+            return schedule;
+	    }
 	}
 }
