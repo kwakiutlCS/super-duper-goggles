@@ -1,0 +1,11 @@
+reminder:
+- id: 1
+  content: updated
+  userId: user
+  createdAt: 1000
+  updatedAt: 1000
+- id: 2
+  content: reminder2
+  userId: user
+  createdAt: 1000
+  updatedAt: 1000

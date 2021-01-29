@@ -69,7 +69,7 @@ public class ReminderAdapter {
 				               .withContent(entity.content)
 				               .withId(entity.id)
 				               .withUser(entity.userId)
-				               .withMetadata(new Metadata(entity.createdAt, entity.updatedAt))
+				               .withMetadata(Metadata.of(entity.createdAt, entity.updatedAt))
 				               .withTime(fromStorage(entity.time))
 				               .build();
 	}

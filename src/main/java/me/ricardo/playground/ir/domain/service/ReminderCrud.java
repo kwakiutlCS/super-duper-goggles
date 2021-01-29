@@ -32,8 +32,7 @@ public class ReminderCrud {
 
 	@Transactional
 	public Reminder createReminder(@Valid Reminder reminder) {
-	    long date = clock.instant().getEpochSecond();
-		ReminderEntity entity = ReminderAdapter.toStorage(reminder, new Metadata(date, date));
+		ReminderEntity entity = ReminderAdapter.toStorage(reminder, Metadata.of(clock.instant().getEpochSecond()));
 		reminderRepository.persist(entity);
 
 		return ReminderAdapter.fromStorage(entity);
@@ -57,7 +56,7 @@ public class ReminderCrud {
 		return reminderRepository.findByIdOptional(reminder.getId())
                                  .filter(r -> r.userId.equals(reminder.getUser()))
                                  .map(e -> ReminderAdapter.toStorage(reminder,
-                                                                     new Metadata(e.createdAt, clock.instant().getEpochSecond()),
+                                                                     Metadata.of(e.createdAt, clock.instant().getEpochSecond()),
                                                                      e))
                                  .map(ReminderAdapter::fromStorage);
 	}

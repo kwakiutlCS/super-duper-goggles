@@ -74,6 +74,7 @@ public class ReminderService {
         Time time = reminder.map(Reminder::getTime)
                             .orElse(NoTime.INSTANCE);
         
+        // not a time reminder, makes no sense truncating. return unmodified
         if (time == NoTime.INSTANCE) {
             return reminder;
         }
