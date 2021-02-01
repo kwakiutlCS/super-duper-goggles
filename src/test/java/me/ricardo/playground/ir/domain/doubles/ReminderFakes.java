@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.domain.doubles;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
@@ -47,6 +48,13 @@ public class ReminderFakes {
         reminder.createdAt = 0;
         reminder.updatedAt = 0;
         reminder.time = timeEntity;
+        
+        return reminder;
+    }
+    
+    public static ReminderEntity DAILY_REPETION_WITH_EXCEPTIONS() {
+        ReminderEntity reminder = DAILY_REPETION();
+        reminder.time.exceptions = Set.of(60L);
         
         return reminder;
     }

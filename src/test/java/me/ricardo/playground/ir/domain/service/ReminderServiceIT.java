@@ -18,6 +18,7 @@ import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
@@ -28,6 +29,16 @@ class ReminderServiceIT {
     
 	@Inject
 	ReminderService service;
+	
+	@Test
+	@DataSet(value = "dataset/daily_repetion_reminder_with_exception.yml", cleanBefore = true)
+    void shouldAccountForExceptionsWhenScheduling() {
+	    // action
+	    List<Long> schedule = service.getSchedule(1L, "user", 0, Bound.count(3));
+	    
+	    // verification
+	    assertEquals(List.of(3600L, 176400L), schedule);
+	}
 	
 	@Test
 	@DataSet(value = "dataset/daily_repetion_reminder.yml", cleanBefore = true)

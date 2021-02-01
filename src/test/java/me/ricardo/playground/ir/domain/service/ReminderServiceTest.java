@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Validation;
@@ -47,7 +48,7 @@ class ReminderServiceTest {
 	        repository = new ReminderRepositoryFake();
 	        
 	        crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
-	        svc = new ReminderService(null, crud);
+	        svc = new ReminderService(repository, crud);
 	    }
 	    
 	    
@@ -67,6 +68,22 @@ class ReminderServiceTest {
 			assertEquals(86460L, schedule.get(1));
 			assertEquals(172860L, schedule.get(2));
 		}
+		
+		@Test
+        void shouldRetrieveReminderScheduleWithExceptions() {
+            // data
+            Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC, Set.of(60L + 86400));
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+
+            Reminder result = crud.createReminder(reminder);
+
+            // action
+            List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.timestamp(200000L));
+
+            // verification
+            assertEquals(60L, schedule.get(0));
+            assertEquals(172860L, schedule.get(1));
+        }
 
 		@Test
 		void shouldRetrieveReminderScheduleWithLimit() {
@@ -113,6 +130,8 @@ class ReminderServiceTest {
 			// verification
 			assertEquals(0, schedule.size());
 		}
+		
+		
 
 		@Test
 		void shouldNotRetrieveSchedulerWithoutBound() throws NoSuchMethodException, SecurityException {

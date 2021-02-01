@@ -2,6 +2,7 @@ package me.ricardo.playground.ir.domain.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.operator.Field;
 import me.ricardo.playground.ir.domain.validation.BoundConstraint;
 import me.ricardo.playground.ir.domain.validation.Bounded;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
@@ -34,12 +36,14 @@ public class ReminderService {
 
 	
 	public List<Long> getSchedule(long id, String user, long start, @NotNull @BoundConstraint @Bounded Bound bound) {
-		return crud.getReminder(id, user)
-		           .map(Reminder::getTime)
-		           .map(t -> t.schedule(start))
-		           .map(bound::apply)
-		           .orElse(Stream.empty())
-		           .collect(Collectors.toList());
+		return reminderRepository.findByIdOptional(id)
+		                         .filter(r -> r.userId.equals(user))
+		                         .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
+		                         .map(Reminder::getTime)
+		                         .map(t -> t.schedule(start))
+		                         .map(bound::apply)
+		                         .orElse(Stream.empty())
+		                         .collect(Collectors.toList());
 	}
 
 	
@@ -74,7 +78,6 @@ public class ReminderService {
         Time time = reminder.map(Reminder::getTime)
                             .orElse(NoTime.INSTANCE);
         
-        // not a time reminder, makes no sense truncating. return unmodified
         if (time == NoTime.INSTANCE) {
             return reminder;
         }

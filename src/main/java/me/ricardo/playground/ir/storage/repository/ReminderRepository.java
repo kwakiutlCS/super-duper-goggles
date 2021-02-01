@@ -11,6 +11,6 @@ import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 public class ReminderRepository implements PanacheRepository<ReminderEntity> {
 
 	public List<ReminderEntity> findByUser(String user) {
-		return list("userId", user);
+		return list("from Reminder r left join fetch r.time t where userId=?1", user);
 	}
 }

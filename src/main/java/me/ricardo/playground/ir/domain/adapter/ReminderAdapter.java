@@ -2,6 +2,7 @@ package me.ricardo.playground.ir.domain.adapter;
 
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
@@ -11,6 +12,7 @@ import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.operator.Field;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
@@ -65,16 +67,24 @@ public class ReminderAdapter {
 	}
 	
 	public static Reminder fromStorage(ReminderEntity entity) {
+	    return fromStorage(entity, Set.of());
+	}
+	
+	public static Reminder fromStorage(ReminderEntity entity, Set<Field> whitelist) {
 		return Reminder.Builder.start()
 				               .withContent(entity.content)
 				               .withId(entity.id)
 				               .withUser(entity.userId)
 				               .withMetadata(Metadata.of(entity.createdAt, entity.updatedAt))
-				               .withTime(fromStorage(entity.time))
+				               .withTime(fromStorage(entity.time, whitelist))
 				               .build();
 	}
 
 	public static Time fromStorage(TimeEntity entity) {
+	    return fromStorage(entity, Set.of());
+	}
+	
+	public static Time fromStorage(TimeEntity entity, Set<Field> whitelist) {
 		if (entity == null) {
 			return NoTime.INSTANCE;
 		}
@@ -90,6 +100,9 @@ public class ReminderAdapter {
 			bound = Bound.timestamp(entity.boundValue);
 		}
 		
-		return new DailyRepetion(entity.time, entity.step, bound, ZoneId.of(entity.zone), entity.exceptions);
+		// optionally lazy load properties
+		Set<Long> exceptions = whitelist.contains(Field.EXCEPTIONS) ? entity.exceptions : Set.of();
+		
+		return new DailyRepetion(entity.time, entity.step, bound, ZoneId.of(entity.zone), exceptions);
 	}
 }

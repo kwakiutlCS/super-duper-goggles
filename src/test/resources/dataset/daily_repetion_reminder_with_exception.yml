@@ -1,0 +1,31 @@
+reminder:
+- id: 1
+  content: content
+  userId: user
+  createdAt: 1000
+  updatedAt: 1000
+  time_id: 2
+- id: 3
+  content: content
+  userId: user
+  createdAt: 1000
+  updatedAt: 1000
+  time_id: 4
+time:
+- id: 2
+  time: 3600 
+  step: 1
+  unit: 7
+  boundType: 0
+  zone: Z
+- id: 4
+  time: 3600 
+  step: 1
+  unit: 7
+  boundType: 0
+  zone: Z
+exception:
+- time_id: 2
+  exceptions: 90000
+- time_id: 4
+  exceptions: 90000

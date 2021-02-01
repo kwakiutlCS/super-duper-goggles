@@ -39,7 +39,7 @@ class ReminderCrudTest {
 
 	@BeforeEach
 	void init() {
-	    repository = new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER(), ReminderFakes.DAILY_REPETION(), ReminderFakes.FIXED_TIME());
+	    repository = new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER(), ReminderFakes.DAILY_REPETION(), ReminderFakes.FIXED_TIME(), ReminderFakes.DAILY_REPETION_WITH_EXCEPTIONS());
 	    crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
 	}
 
@@ -47,7 +47,7 @@ class ReminderCrudTest {
 	class FindReminders {
 		@Test
 		void shouldFindAllReminders() {
-			assertEquals(3, crud.getReminders("user").size());
+			assertEquals(4, crud.getReminders("user").size());
 		}
 
 		@Test
@@ -77,6 +77,11 @@ class ReminderCrudTest {
 		void shouldNotFindNonExistingReminder() {
 			assertTrue(crud.getReminder(999L, "user").isEmpty());
 		}
+		
+		@Test
+		void shouldNotRetrieveExceptionsForReminder() {
+		    assertTrue(((DailyRepetion) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
+		}
 	}
 
 	@Nested
@@ -90,7 +95,7 @@ class ReminderCrudTest {
 			Reminder result = crud.createReminder(reminder);
 
 			// verification
-			assertEquals(4L, result.getId());
+			assertEquals(5L, result.getId());
 			assertEquals(TIMESTAMP, result.getMetadata().createdAt());
 			assertEquals(TIMESTAMP, result.getMetadata().updatedAt());
 		}

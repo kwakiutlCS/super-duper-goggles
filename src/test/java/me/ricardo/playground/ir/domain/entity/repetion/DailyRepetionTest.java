@@ -41,6 +41,16 @@ class DailyRepetionTest {
 	}
 	
 	@Test
+	void shouldHaveExceptionsToSchedule() {
+	    // data
+	    Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(3), ZoneOffset.UTC, Set.of(TIMESTAMP));
+	    Reminder reminder = Reminder.Builder.start().withTime(time).build();
+	    
+	    // verification
+	    assertEquals(List.of(TIMESTAMP + DAY), reminder.getTime().schedule().limit(1).collect(Collectors.toList()));
+	}
+	
+	@Test
 	void shouldHaveBoundedOneDayRepetion() {
 		// data
 		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);

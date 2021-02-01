@@ -58,6 +58,18 @@ class ReminderCrudIT {
 	}
 	
 	@Test
+    @DataSet(value = "dataset/daily_repetion_reminder_with_exception.yml", cleanBefore = true)
+    void shouldFindTimeRemindersByUser() {
+        // action
+        List<Reminder> userReminders = crud.getReminders("user");
+        List<Reminder> otherUserReminders = crud.getReminders("otherUser");
+        
+        // verification
+        assertEquals(2, userReminders.size());
+        assertEquals(0, otherUserReminders.size());
+    }
+	
+	@Test
 	@DataSet(value = "dataset/simple_reminders.yml", cleanBefore = true)
     void shouldFindReminderById() {
 		// action
