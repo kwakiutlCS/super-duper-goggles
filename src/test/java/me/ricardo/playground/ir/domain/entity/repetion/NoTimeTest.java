@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
+
 class NoTimeTest {
 
     @Test
     void shouldNotHaveSchedule() {
         assertEquals(0L, NoTime.INSTANCE.schedule().count());
         assertEquals(0L, NoTime.INSTANCE.schedule(0).count());
+        assertEquals(0L, NoTime.INSTANCE.schedule(0, Bound.count(3)).count());
     }
     
     @Test

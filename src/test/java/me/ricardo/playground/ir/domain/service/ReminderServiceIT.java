@@ -18,7 +18,7 @@ import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 

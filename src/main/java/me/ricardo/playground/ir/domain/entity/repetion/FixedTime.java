@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import javax.validation.constraints.PositiveOrZero;
 
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.utils.Utils;
 
 public final class FixedTime implements Time {
@@ -27,6 +28,11 @@ public final class FixedTime implements Time {
 	@Override
 	public Stream<Long> schedule(long offset) {
 		return offset > time ? Stream.empty() : schedule();
+	}
+	
+	@Override
+	public Stream<Long> schedule(long offset, Bound bound) {
+	    return bound.apply(schedule(offset));
 	}
 	
 	@Override

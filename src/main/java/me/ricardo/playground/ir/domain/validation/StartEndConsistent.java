@@ -11,7 +11,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.validation.StartEndConsistent.StartEndConsistentValidator;
 
@@ -34,7 +34,7 @@ public @interface StartEndConsistent {
         public boolean isValid(final DailyRepetion value, final ConstraintValidatorContext context) {
         	boolean valid = true;
         	
-        	if (value != null && value.getBound().type() == BoundType.TIMESTAMP_BOUND && value.getBound().timestamp() <= value.getStart()) {
+        	if (value != null && value.getBound() != null && value.getBound().type() == BoundType.TIMESTAMP_BOUND && value.getBound().timestamp() <= value.getStart()) {
         	    valid = false;
         	    context.disableDefaultConstraintViolation();
         	    context.buildConstraintViolationWithTemplate("must have timestamp bound after start value").addConstraintViolation();

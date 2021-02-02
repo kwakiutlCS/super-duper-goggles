@@ -1,9 +1,11 @@
 package me.ricardo.playground.ir.domain.entity.repetion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -14,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
 
 class FixedTimeTest {
 
@@ -112,4 +115,19 @@ class FixedTimeTest {
             assertEquals(NoTime.INSTANCE, result);
 	    }
 	}
+	
+	@Nested
+    class Scheduling {
+        @Test
+        void shouldAllowExtraBoundInSchedule() {
+            // data
+            Time time = new FixedTime(3600L);
+            
+            // action
+            Stream<Long> schedule = time.schedule(0L, Bound.timestamp(3000L));
+            
+            // verification
+            assertTrue(schedule.collect(Collectors.toList()).isEmpty());
+        }
+    }
 }

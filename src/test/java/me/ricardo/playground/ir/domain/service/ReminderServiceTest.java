@@ -23,7 +23,8 @@ import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.doubles.ReminderFakes;
 import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
@@ -142,7 +143,7 @@ class ReminderServiceTest {
 			crud.createReminder(reminder);
 
 			// verification
-			assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, Bound.class), new Object[] {999L, "user", 0, Bound.none()}).size());
+			assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.none()}).size());
 		}
 
 		@Test
@@ -154,7 +155,7 @@ class ReminderServiceTest {
 			crud.createReminder(reminder);
 
 			// verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, Bound.class), new Object[] {999L, "user", 0, null}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, null}).size());
 		}
 		
 		@Test
@@ -166,7 +167,7 @@ class ReminderServiceTest {
             crud.createReminder(reminder);
 
             // verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, Bound.class), new Object[] {999L, "user", 0, Bound.count(-1)}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.count(-1)}).size());
         }
 		
 		@Test
@@ -178,8 +179,25 @@ class ReminderServiceTest {
             crud.createReminder(reminder);
 
             // verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, Bound.class), new Object[] {999L, "user", 0, Bound.timestamp(-1)}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.timestamp(-1)}).size());
         }
+		
+		@Test
+		void shouldBeAbleToAddExtraBound() {
+		    // data
+            Time time = new DailyRepetion(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(60L));
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+
+            Reminder result = crud.createReminder(reminder);
+            
+            // action
+            List<Long> schedule1 = svc.getSchedule(result.getId(), "user", 0L, Bound.count(2));
+            List<Long> schedule2 = svc.getSchedule(result.getId(), "user", 0L, Bound.count(4));
+            
+            // verification
+            assertEquals(1, schedule1.size()); // request has limit of 2, only shows 1 because of 1 exception
+            assertEquals(2, schedule2.size()); // reminder has limit of 3, only shows 2 because of 1 exception
+		}
 	}
 	
 	@Nested

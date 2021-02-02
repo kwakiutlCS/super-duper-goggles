@@ -17,6 +17,7 @@ import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
@@ -36,7 +37,7 @@ class ReminderCrudIT {
 	@ExpectedDataSet(value = "expected/simple_reminder.yml")
 	void shouldCreateReminder() {
 		// data
-		Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
+		Reminder reminder = Reminder.Builder.start().withContent("content").withMetadata(Metadata.of(0L)).withUser("user").build();
 		
 		// action
 		Reminder result = crud.createReminder(reminder);

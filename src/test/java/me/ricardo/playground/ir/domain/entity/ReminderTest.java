@@ -130,4 +130,16 @@ class ReminderTest {
 	    // verification
 	    assertEquals(NoTime.INSTANCE, reminder.getTime());
 	}
+	
+	@Test
+	void shouldNotHaveNullMetadata() {
+	    // verification
+        assertFalse(validator.validateValue(Reminder.class, "metadata", null).isEmpty());
+	}
+	
+	@Test
+    void shouldNotHaveNullContent() {
+        // verification
+        assertFalse(validator.validateValue(Reminder.class, "content", null).isEmpty());
+    }
 }

@@ -23,8 +23,10 @@ public class Reminder {
 	@NotBlank(groups = {Default.class, ReminderUpdate.class})
 	private final String user;
 	
+	@NotNull
 	private final String content;
 
+	@NotNull
 	private final Metadata metadata;
 	
 	@Valid

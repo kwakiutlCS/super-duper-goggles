@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import me.ricardo.playground.ir.domain.doubles.ReminderFakes;
 import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
@@ -125,7 +125,6 @@ class ReminderCrudTest {
 			// verification
 			assertEquals(1, ((DailyRepetion) result.getTime()).getStep());
 			assertEquals(ZoneOffset.UTC, ((DailyRepetion) result.getTime()).getZone());
-			assertEquals(3, ((DailyRepetion) result.getTime()).getBound().limit());
 			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
 		}
 		
@@ -141,7 +140,6 @@ class ReminderCrudTest {
 			// verification
 			assertEquals(1, ((DailyRepetion) result.getTime()).getStep());
 			assertEquals(ZoneOffset.UTC, ((DailyRepetion) result.getTime()).getZone());
-			assertEquals(90L, ((DailyRepetion) result.getTime()).getBound().timestamp());
 			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
 		}
 		

@@ -11,8 +11,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
 import me.ricardo.playground.ir.domain.validation.Bounded.BoundValidator;
 
 @Documented
@@ -28,10 +28,10 @@ public @interface Bounded {
     Class<? extends Payload>[] payload() default {};
     
     
-    class BoundValidator implements ConstraintValidator<Bounded, Bound> {
+    class BoundValidator implements ConstraintValidator<Bounded, SingleBound> {
         
         @Override
-        public boolean isValid(final Bound value, final ConstraintValidatorContext context) {
+        public boolean isValid(final SingleBound value, final ConstraintValidatorContext context) {
         	boolean valid = true;
         	
         	if (value != null) {

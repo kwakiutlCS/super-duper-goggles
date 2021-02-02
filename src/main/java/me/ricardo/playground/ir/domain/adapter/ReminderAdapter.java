@@ -6,8 +6,9 @@ import java.util.Set;
 
 import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
 import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
 import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
@@ -93,7 +94,7 @@ public class ReminderAdapter {
 			return new FixedTime(entity.time);
 		}
 		
-		Bound bound = Bound.none();
+		SingleBound bound = Bound.none();
 		if (entity.boundType == BoundType.COUNT_BOUND.ordinal()) {
 			bound = Bound.count(entity.boundValue);
 		} else if (entity.boundType == BoundType.TIMESTAMP_BOUND.ordinal()) {

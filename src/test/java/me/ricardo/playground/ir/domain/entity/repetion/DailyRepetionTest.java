@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -20,7 +20,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound.BoundType;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
+
 
 class DailyRepetionTest {
 
@@ -266,7 +267,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder() {
 		// data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(60L + ChronoUnit.DAYS.getDuration().getSeconds()));
+		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(86460L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -275,7 +276,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder2() {
 		// data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 60L + ChronoUnit.DAYS.getDuration().getSeconds(), 999999L));
+		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 86460L, 999999L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -297,6 +298,12 @@ class DailyRepetionTest {
 		
 		// verication
 		assertTrue(time.getExceptions().isEmpty());
+	}
+	
+	@Test
+	void shouldNotAllowNullZone() {
+	    // verification
+        assertEquals(1, validator.validateValue(DailyRepetion.class, "zone", null).size());
 	}
 	
 	@Nested
@@ -333,22 +340,21 @@ class DailyRepetionTest {
 	    @ParameterizedTest
 	    @ValueSource(longs = {0, -1, -10})
 	    void shouldNotAllowNonPositiveLimitBound(long limit) {
+	        // data
+	        Time time = new DailyRepetion(0, 1, Bound.count(limit), ZoneOffset.UTC);
+	        
 	        // verification
-	        assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", Bound.count(limit)).size());
+	        assertEquals(1, validator.validate(time).size());
 	    }
 	    
 	    @ParameterizedTest
         @ValueSource(longs = {0, -1, -10})
         void shouldNotAllowNonPositiveTimestampBound(long timestamp) {
+	        // data
+            Time time = new DailyRepetion(0, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
+            
             // verification
-            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", Bound.timestamp(timestamp)).size());
-        }
-	    
-	    @Test
-        void shouldNotAllowValuesForNoBound() {
-            // verification
-            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", new Bound(BoundType.NO_BOUND, 0, 1)).size());
-            assertEquals(1, validator.validateValue(DailyRepetion.class, "bound", new Bound(BoundType.NO_BOUND, 1, 0)).size());
+            assertEquals(2, validator.validate(time).size());
         }
 	    
 	    @ParameterizedTest
@@ -360,6 +366,16 @@ class DailyRepetionTest {
             // verification
             assertEquals(1, validator.validate(time).size());
         }
+	    
+	    @Test
+	    void shouldAllowNullBound() {
+	        // data
+            DailyRepetion time = new DailyRepetion(3600L, 1, null, ZoneOffset.UTC);
+            
+            // verification
+            assertEquals(0, validator.validate(time).size());
+            assertEquals(List.of(3600L), time.schedule(0, Bound.count(1L)).collect(Collectors.toList()));
+	    }
 	}
 	
 	@Nested
@@ -420,6 +436,21 @@ class DailyRepetionTest {
             assertEquals(time.getStep(), ((DailyRepetion) result).getStep());
             assertEquals(time.getZone(), ((DailyRepetion) result).getZone());
             assertEquals(Set.of(3600L + DAY), ((DailyRepetion) result).getExceptions());
+	    }
+	}
+	
+	@Nested
+	class Scheduling {
+	    @Test
+	    void shouldAllowExtraBoundInSchedule() {
+	        // data
+	        Time time = new DailyRepetion(3600L, 1, Bound.none(), ZoneOffset.UTC);
+	        
+	        // action
+	        Stream<Long> schedule = time.schedule(0L, Bound.count(1L));
+	        
+	        // verification
+	        assertEquals(List.of(3600L), schedule.collect(Collectors.toList()));
 	    }
 	}
 }

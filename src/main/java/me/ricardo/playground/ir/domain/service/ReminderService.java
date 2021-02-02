@@ -8,15 +8,15 @@ import java.util.stream.Stream;
 
 import javax.enterprise.context.Dependent;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
 import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetion.Time;
 import me.ricardo.playground.ir.domain.operator.Field;
-import me.ricardo.playground.ir.domain.validation.BoundConstraint;
 import me.ricardo.playground.ir.domain.validation.Bounded;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
@@ -35,13 +35,12 @@ public class ReminderService {
 	}
 
 	
-	public List<Long> getSchedule(long id, String user, long start, @NotNull @BoundConstraint @Bounded Bound bound) {
+	public List<Long> getSchedule(long id, String user, long start, @NotNull @Bounded @Valid SingleBound bound) {
 		return reminderRepository.findByIdOptional(id)
 		                         .filter(r -> r.userId.equals(user))
 		                         .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
 		                         .map(Reminder::getTime)
-		                         .map(t -> t.schedule(start))
-		                         .map(bound::apply)
+		                         .map(t -> t.schedule(start, bound))
 		                         .orElse(Stream.empty())
 		                         .collect(Collectors.toList());
 	}

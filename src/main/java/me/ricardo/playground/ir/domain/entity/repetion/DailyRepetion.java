@@ -10,10 +10,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import me.ricardo.playground.ir.domain.validation.BoundConstraint;
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
 import me.ricardo.playground.ir.domain.validation.StartEndConsistent;
 import me.ricardo.playground.ir.utils.Utils;
 
@@ -23,12 +26,13 @@ public final class DailyRepetion implements Time {
     @PositiveOrZero
 	private final long start;
 	
-	@BoundConstraint
-	private final Bound bound;
+    @Valid
+	private final SingleBound bound;
 	
 	@Positive
 	private final int step;
 	
+	@NotNull
 	private final ZoneId zone;
 	
 	private final Set<Long> exceptions;
@@ -37,13 +41,13 @@ public final class DailyRepetion implements Time {
 		this(start, 1, Bound.none(), ZoneOffset.UTC);
 	}
 	
-	public DailyRepetion(long start, int step, Bound bound, ZoneId zone) {
+	public DailyRepetion(long start, int step, SingleBound bound, ZoneId zone) {
 		this(start, step, bound, zone, new HashSet<>());
 	}
 	
-	public DailyRepetion(long start, int step, Bound bound, ZoneId zone, Set<Long> exceptions) {
+	public DailyRepetion(long start, int step, SingleBound bound, ZoneId zone, Set<Long> exceptions) {
 		this.start = Utils.truncateToMinute(start);
-		this.bound = bound;
+		this.bound = bound != null ? bound : Bound.none();
 		this.step = step;
 		this.zone = zone;
 		this.exceptions = exceptions == null ? new HashSet<>() : filterValidExceptions(exceptions);
@@ -61,7 +65,7 @@ public final class DailyRepetion implements Time {
 		return zone;
 	}
 
-	public Bound getBound() {
+	public SingleBound getBound() {
 		return bound;
 	}
 	
@@ -84,9 +88,14 @@ public final class DailyRepetion implements Time {
 
 	@Override
 	public Stream<Long> schedule(long offset) {
-		return scheduleBeforeExceptions(offset).filter(s -> !exceptions.contains(s));
+		return schedule(offset, Bound.none());
 	}
 
+    @Override
+    public Stream<Long> schedule(long offset, Bound externalBound) {
+        return scheduleBeforeExceptions(offset, externalBound).filter(s -> !exceptions.contains(s));
+    }
+    
     @Override
     public Time truncate(long timestamp) {
         if (timestamp <= start)
@@ -95,7 +104,7 @@ public final class DailyRepetion implements Time {
         return new DailyRepetion(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
     }	
     
-	private Stream<Long> scheduleBeforeExceptions(long offset) {
+	private Stream<Long> scheduleBeforeExceptions(long offset, Bound externalBound) {
 		var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
 		var iterations = calculateNumberIterations(startDate, offset);
@@ -105,7 +114,7 @@ public final class DailyRepetion implements Time {
 		var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
 			     	 	     		.map(ZonedDateTime::toEpochSecond);
 		
-		return bound.apply(noBoundSchedule, iterations);
+		return bound.add(externalBound).apply(noBoundSchedule, iterations);
 	}
 	
 	
@@ -118,7 +127,7 @@ public final class DailyRepetion implements Time {
 		return fullIterations + partialIterations;
 	}
 	
-		
+	
 	private Set<Long> filterValidExceptions(Set<Long> exceptions) {
 		return exceptions.stream()
 		                 .filter(this::isExceptionValid)
@@ -127,8 +136,9 @@ public final class DailyRepetion implements Time {
 	
 	
 	private boolean isExceptionValid(long exception) {
-	    return scheduleBeforeExceptions(exception).takeWhile(s -> s <= exception)
-	                                              .findAny()
-	                                              .isPresent();
+	    return scheduleBeforeExceptions(exception, Bound.timestamp(exception))
+	            .findAny()
+	            .isPresent();
 	}
+
 }
