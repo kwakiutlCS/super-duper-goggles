@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
+import me.ricardo.playground.ir.storage.entity.BoundType;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
 class ReminderAdapterTest {
@@ -23,5 +24,17 @@ class ReminderAdapterTest {
         
         // verification
         assertEquals(7320, result.minute);
+    }
+    
+    @Test
+    void shouldConvertBoundType() {
+        // data
+        Time time = new DailyRepetition(86400 * 44 + 7320L, 1, Bound.none(), ZoneOffset.UTC);
+        
+        // action
+        TimeEntity result = ReminderAdapter.toStorage(time);
+        
+        // verification
+        assertEquals(BoundType.NO_BOUND, result.boundType);
     }
 }

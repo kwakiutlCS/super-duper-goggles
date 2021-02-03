@@ -24,9 +24,10 @@ import me.ricardo.playground.ir.domain.doubles.ReminderFakes;
 import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
-import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
+import me.ricardo.playground.ir.domain.entity.bound.GuaranteedBound;
 import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
+import me.ricardo.playground.ir.storage.entity.BoundType;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
@@ -95,7 +96,7 @@ class ReminderServiceTest {
 			Reminder result = crud.createReminder(reminder);
 
 			// action
-			List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.count(1L));
+			List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.count(1));
 
 			// verification
 			assertEquals(60L, schedule.get(0));
@@ -132,20 +133,6 @@ class ReminderServiceTest {
 			assertEquals(0, schedule.size());
 		}
 		
-		
-
-		@Test
-		void shouldNotRetrieveSchedulerWithoutBound() throws NoSuchMethodException, SecurityException {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
-
-			crud.createReminder(reminder);
-
-			// verification
-			assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.none()}).size());
-		}
-
 		@Test
 		void shouldNotRetrieveSchedulerWithNullBound() throws NoSuchMethodException, SecurityException {
 			// data
@@ -155,7 +142,7 @@ class ReminderServiceTest {
 			crud.createReminder(reminder);
 
 			// verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, null}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, null}).size());
 		}
 		
 		@Test
@@ -167,7 +154,7 @@ class ReminderServiceTest {
             crud.createReminder(reminder);
 
             // verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.count(-1)}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, Bound.count(-1)}).size());
         }
 		
 		@Test
@@ -179,7 +166,7 @@ class ReminderServiceTest {
             crud.createReminder(reminder);
 
             // verification
-            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, SingleBound.class), new Object[] {999L, "user", 0, Bound.timestamp(-1)}).size());
+            assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, Bound.timestamp(-1)}).size());
         }
 		
 		@Test
@@ -283,7 +270,7 @@ class ReminderServiceTest {
 	        ReminderEntity reminder = ReminderFakes.DAILY_REPETION();
 	        ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
 	        long timestamp = 1036860;
-	        assertEquals(List.of(1036860L), ReminderAdapter.fromStorage(reminder).getTime().schedule(timestamp).limit(1).collect(Collectors.toList()));
+	        assertEquals(List.of(1036860L), ReminderAdapter.fromStorage(reminder).getTime().schedule(timestamp, Bound.count(Integer.MAX_VALUE)).limit(1).collect(Collectors.toList()));
 	        
 	        // action
 	        Reminder result = svc.truncate(1L, "user", timestamp).get();
@@ -292,8 +279,8 @@ class ReminderServiceTest {
 	        assertEquals(reminder.id, result.getId());
 	        assertEquals(reminder.content, result.getContent());
 	        assertEquals(reminder.createdAt, result.getMetadata().createdAt());
-	        assertEquals(2, reminder.time.boundType);
-	        assertEquals(List.of(), result.getTime().schedule(timestamp).collect(Collectors.toList()));
+	        assertEquals(BoundType.TIMESTAMP_BOUND, reminder.time.boundType);
+	        assertEquals(List.of(), result.getTime().schedule(timestamp, Bound.count(1)).collect(Collectors.toList()));
 	    }
 	    
 	    @Test

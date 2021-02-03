@@ -116,7 +116,7 @@ class ReminderCrudTest {
 		@Test
 		void shouldCreateDailyRepetionTimeReminderBoundCount() {
 			// data
-			Time time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
 			
 			// action

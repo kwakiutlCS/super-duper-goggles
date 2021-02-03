@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 
@@ -22,21 +23,12 @@ class ReminderTest {
 	private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	
 	@Test
-	void shouldHaveEmptyScheduleIfNoTime() {
-		// data
-		Reminder reminder = Reminder.Builder.start().withContent("content").build();
-		
-		// verification
-		assertEquals(Optional.empty(), reminder.getTime().schedule().findAny());
-	}
-	
-	@Test
 	void shouldHaveEmptyScheduleFromOffsetIfNoTime() {
 		// data
 		Reminder reminder = Reminder.Builder.start().withContent("content").build();
 		
 		// verification
-		assertEquals(Optional.empty(), reminder.getTime().schedule(0L).findAny());
+		assertEquals(Optional.empty(), reminder.getTime().schedule(0L, Bound.count(1)).findAny());
 	}
 	
 	@Test

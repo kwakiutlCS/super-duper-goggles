@@ -3,22 +3,31 @@ package me.ricardo.playground.ir.domain.adapter;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.function.LongFunction;
 
 import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
+import me.ricardo.playground.ir.domain.entity.bound.AtomicBound;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
-import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
-import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
+import me.ricardo.playground.ir.domain.entity.bound.CountBound;
+import me.ricardo.playground.ir.domain.entity.bound.NoBound;
+import me.ricardo.playground.ir.domain.entity.bound.TimeBound;
 import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
 import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.domain.operator.Field;
+import me.ricardo.playground.ir.storage.entity.BoundType;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
 public class ReminderAdapter {
-	
+    
+    private static final Set<BoundAdapter> boundAdapter = Set.of(
+            new BoundAdapter(NoBound.BOUND_TYPE, BoundType.NO_BOUND, value -> Bound.none()),
+            new BoundAdapter(CountBound.BOUNT_TYPE, BoundType.COUNT_BOUND, value -> Bound.count(value)),
+            new BoundAdapter(TimeBound.BOUND_TYPE, BoundType.TIMESTAMP_BOUND, value -> Bound.timestamp(value)));
+    
 	private ReminderAdapter() { }
 	
 	public static ReminderEntity toStorage(Reminder reminder, Metadata metadata) {
@@ -47,20 +56,21 @@ public class ReminderAdapter {
 	public static TimeEntity toStorage(Time time, TimeEntity entity) {
 		if (time instanceof FixedTime f) {
 			entity.time = f.getTime();
+			
 		} else if (time instanceof DailyRepetition d) {
 			entity.time = d.getStart();
 			entity.minute = d.getStart() % ChronoUnit.DAYS.getDuration().getSeconds();
 			entity.unit = ChronoUnit.DAYS;
 			entity.step = d.getStep();
 			entity.zone = d.getZone().getId();
-			entity.boundType = d.getBound().type().ordinal();
 			entity.exceptions = d.getExceptions();
-			
-			if (d.getBound().type() == BoundType.COUNT_BOUND) {
-				entity.boundValue = Long.valueOf(d.getBound().limit());
-			} else if (d.getBound().type() == BoundType.TIMESTAMP_BOUND) {
-				entity.boundValue = d.getBound().timestamp();
-			}
+			entity.boundValue = d.getBound().getValue();
+			entity.boundType = boundAdapter.stream()
+			                               .filter(ba -> ba.domainType().equals(d.getBound().getType()))
+			                               .map(BoundAdapter::storageType)
+			                               .findFirst()
+			                               .orElseThrow();
+
 		} else {
 		    entity = null;
 		}
@@ -95,16 +105,19 @@ public class ReminderAdapter {
 			return new FixedTime(entity.time);
 		}
 		
-		SingleBound bound = Bound.none();
-		if (entity.boundType == BoundType.COUNT_BOUND.ordinal()) {
-			bound = Bound.count(entity.boundValue);
-		} else if (entity.boundType == BoundType.TIMESTAMP_BOUND.ordinal()) {
-			bound = Bound.timestamp(entity.boundValue);
-		}
+		AtomicBound bound = boundAdapter.stream()
+		                                .filter(ba -> ba.storageType == entity.boundType)
+		                                .map(BoundAdapter::f)
+		                                .findFirst()
+		                                .orElseThrow()
+		                                .apply(entity.boundValue);
 		
 		// optionally lazy load properties
 		Set<Long> exceptions = whitelist.contains(Field.EXCEPTIONS) ? entity.exceptions : Set.of();
 		
 		return new DailyRepetition(entity.time, entity.step, bound, ZoneId.of(entity.zone), exceptions);
 	}
+	
+	
+	static record BoundAdapter(String domainType, BoundType storageType, LongFunction<AtomicBound> f) { }
 }

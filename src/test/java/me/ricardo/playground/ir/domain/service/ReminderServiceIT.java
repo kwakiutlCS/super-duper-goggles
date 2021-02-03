@@ -59,7 +59,7 @@ class ReminderServiceIT {
 	    Optional<Reminder> result = service.truncate(1L, "user", 3601);
 	    
 	    // verification
-	    assertEquals(List.of(3600L), result.get().getTime().schedule().limit(2).collect(Collectors.toList()));
+	    assertEquals(List.of(3600L), result.get().getTime().schedule(0L, Bound.count(2)).collect(Collectors.toList()));
 	}
 	
 	@Test

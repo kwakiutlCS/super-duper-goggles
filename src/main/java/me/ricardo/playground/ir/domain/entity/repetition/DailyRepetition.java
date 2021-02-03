@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.validation.Valid;
@@ -17,8 +16,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import me.ricardo.playground.ir.domain.entity.bound.AtomicBound;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
-import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
+import me.ricardo.playground.ir.domain.entity.bound.GuaranteedBound;
 import me.ricardo.playground.ir.domain.validation.StartEndConsistent;
 import me.ricardo.playground.ir.utils.Utils;
 
@@ -29,7 +29,7 @@ public final class DailyRepetition implements Time {
 	private final long start;
 	
     @Valid
-	private final SingleBound bound;
+	private final AtomicBound bound;
 	
 	@Positive
 	private final int step;
@@ -43,11 +43,11 @@ public final class DailyRepetition implements Time {
 		this(start, 1, Bound.none(), ZoneOffset.UTC);
 	}
 	
-	public DailyRepetition(long start, int step, SingleBound bound, ZoneId zone) {
+	public DailyRepetition(long start, int step, AtomicBound bound, ZoneId zone) {
 		this(start, step, bound, zone, new HashSet<>());
 	}
 	
-	public DailyRepetition(long start, int step, SingleBound bound, ZoneId zone, Set<Long> exceptions) {
+	public DailyRepetition(long start, int step, AtomicBound bound, ZoneId zone, Set<Long> exceptions) {
 		this.start = Utils.truncateToMinute(start);
 		this.bound = bound != null ? bound : Bound.none();
 		this.step = step;
@@ -67,7 +67,7 @@ public final class DailyRepetition implements Time {
 		return zone;
 	}
 
-	public SingleBound getBound() {
+	public AtomicBound getBound() {
 		return bound;
 	}
 	
@@ -84,17 +84,7 @@ public final class DailyRepetition implements Time {
     }
     
 	@Override
-	public Stream<Long> schedule() {
-		return schedule(start);
-	}
-
-	@Override
-	public Stream<Long> schedule(long offset) {
-		return schedule(offset, Bound.none());
-	}
-
-    @Override
-    public Stream<Long> schedule(long offset, Bound externalBound) {
+    public Stream<Long> schedule(long offset, GuaranteedBound externalBound) {
         return scheduleBeforeExceptions(offset, externalBound).filter(s -> !exceptions.contains(s));
     }
     
@@ -106,7 +96,7 @@ public final class DailyRepetition implements Time {
         return new DailyRepetition(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
     }	
     
-	private Stream<Long> scheduleBeforeExceptions(long offset, Bound externalBound) {
+	private Stream<Long> scheduleBeforeExceptions(long offset, GuaranteedBound externalBound) {
 		var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
 		
 		var iterations = calculateNumberIterations(startDate, offset);

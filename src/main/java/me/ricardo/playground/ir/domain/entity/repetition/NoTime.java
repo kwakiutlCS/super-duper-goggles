@@ -2,7 +2,7 @@ package me.ricardo.playground.ir.domain.entity.repetition;
 
 import java.util.stream.Stream;
 
-import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.bound.GuaranteedBound;
 
 public final class NoTime implements Time {
 
@@ -11,17 +11,7 @@ public final class NoTime implements Time {
     private NoTime() { }
     
     @Override
-    public Stream<Long> schedule() {
-        return Stream.empty();
-    }
-
-    @Override
-    public Stream<Long> schedule(long start) {
-        return Stream.empty();
-    }
-    
-    @Override
-    public Stream<Long> schedule(long start, Bound bound) {
+    public Stream<Long> schedule(long start, GuaranteedBound bound) {
         return Stream.empty(); 
     }
 

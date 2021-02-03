@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,10 +22,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
-import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
-import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
-import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
-import me.ricardo.playground.ir.domain.entity.repetition.Time;
 
 
 class DailyRepetitionTest {
@@ -42,7 +39,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY, TIMESTAMP+2*DAY), reminder.getTime().schedule().limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY, TIMESTAMP+2*DAY), reminder.getTime().schedule(0, Bound.count(3)).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -52,27 +49,27 @@ class DailyRepetitionTest {
 	    Reminder reminder = Reminder.Builder.start().withTime(time).build();
 	    
 	    // verification
-	    assertEquals(List.of(TIMESTAMP + DAY), reminder.getTime().schedule().limit(1).collect(Collectors.toList()));
+	    assertEquals(List.of(TIMESTAMP + DAY), reminder.getTime().schedule(0, Bound.count(3)).limit(1).collect(Collectors.toList()));
 	}
 	
 	@Test
-	void shouldHaveBoundedOneDayRepetion() {
+	void shouldHaveBedOneDayRepetion() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP), reminder.getTime().schedule().limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP), reminder.getTime().schedule(0, Bound.count(3)).collect(Collectors.toList()));
 	}
 	
 	@Test
-	void shouldHaveBoundedOneDayRepetion2() {
+	void shouldHaveBedOneDayRepetion2() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.getTime().schedule().limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.getTime().schedule(0, Bound.count(3)).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -82,7 +79,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP, TIMESTAMP+ 2*DAY, TIMESTAMP+ 4*DAY), reminder.getTime().schedule().limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP, TIMESTAMP+ 2*DAY, TIMESTAMP+ 4*DAY), reminder.getTime().schedule(0, Bound.count(3)).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -92,7 +89,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.getTime().schedule(TIMESTAMP+1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.getTime().schedule(TIMESTAMP+1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -102,7 +99,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.getTime().schedule(TIMESTAMP+DAY-1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+DAY, TIMESTAMP+2*DAY, TIMESTAMP+3*DAY), reminder.getTime().schedule(TIMESTAMP+DAY-1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -112,7 +109,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -122,7 +119,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+DAY-1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+DAY-1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -132,7 +129,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+ 2*DAY + 1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+ 2*DAY + 1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -142,7 +139,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+ 2*DAY - 1).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+ 2*DAY - 1, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -152,7 +149,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+3*DAY).limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+3*DAY, TIMESTAMP+6*DAY, TIMESTAMP+9*DAY), reminder.getTime().schedule(TIMESTAMP+3*DAY, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -162,9 +159,9 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(1603497600, reminder.getTime().schedule(1603497600L).limit(3).collect(Collectors.toList()).get(0));
-		assertEquals(1603497600+DAY, reminder.getTime().schedule(1603497600L).limit(3).collect(Collectors.toList()).get(1));
-		assertEquals(1603501200+2*DAY, reminder.getTime().schedule(1603497600L).limit(3).collect(Collectors.toList()).get(2));
+		assertEquals(1603497600, reminder.getTime().schedule(1603497600L, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()).get(0));
+		assertEquals(1603497600+DAY, reminder.getTime().schedule(1603497600L, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()).get(1));
+		assertEquals(1603501200+2*DAY, reminder.getTime().schedule(1603497600L, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()).get(2));
 	}
 	
 	@Test
@@ -174,9 +171,9 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(1585281600, reminder.getTime().schedule(1585281600L).limit(3).collect(Collectors.toList()).get(0));
-		assertEquals(1585281600+DAY, reminder.getTime().schedule(1585281600L).limit(3).collect(Collectors.toList()).get(1));
-		assertEquals(1585278000+2*DAY, reminder.getTime().schedule(1585281600L).limit(3).collect(Collectors.toList()).get(2));
+		assertEquals(1585281600, reminder.getTime().schedule(1585281600L, Bound.count(Integer.MAX_VALUE)).limit(1).collect(Collectors.toList()).get(0));
+		assertEquals(1585281600+DAY, reminder.getTime().schedule(1585281600L, Bound.count(Integer.MAX_VALUE)).limit(2).collect(Collectors.toList()).get(1));
+		assertEquals(1585278000+2*DAY, reminder.getTime().schedule(1585281600L, Bound.count(Integer.MAX_VALUE)).limit(3).collect(Collectors.toList()).get(2));
 	}
 	
 	@Test
@@ -186,7 +183,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(1603591320, reminder.getTime().schedule(1603591260).limit(3).collect(Collectors.toList()).get(0));
+		assertEquals(1603591320, reminder.getTime().schedule(1603591260, Bound.count(Integer.MAX_VALUE)).limit(1).collect(Collectors.toList()).get(0));
 	}
 	
 	@Test
@@ -196,56 +193,56 @@ class DailyRepetitionTest {
 		
 		// verification
 		Reminder r1 = builder.withTime(new FixedTime(20)).build();
-		assertEquals(0, r1.getTime().schedule().collect(Collectors.toList()).get(0));
+		assertEquals(0, r1.getTime().schedule(0L, Bound.count(2)).collect(Collectors.toList()).get(0));
 		
 		Reminder r2 = builder.withTime(new FixedTime(60)).build();
-		assertEquals(60, r2.getTime().schedule().collect(Collectors.toList()).get(0));
+		assertEquals(60, r2.getTime().schedule(0L, Bound.count(2)).collect(Collectors.toList()).get(0));
 		
 		Reminder r3 = builder.withTime(new FixedTime(80)).build();
-		assertEquals(60, r3.getTime().schedule().collect(Collectors.toList()).get(0));
+		assertEquals(60, r3.getTime().schedule(0L, Bound.count(2)).collect(Collectors.toList()).get(0));
 		
 		Reminder r4 = builder.withTime(new FixedTime(120)).build();
-		assertEquals(120, r4.getTime().schedule().collect(Collectors.toList()).get(0));
+		assertEquals(120, r4.getTime().schedule(0L, Bound.count(2)).collect(Collectors.toList()).get(0));
 	}
 	
 	@Test
-	void shouldBoundScheduleByCount() {
+	void shouldBScheduleByCount() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.getTime().schedule().limit(3).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP, TIMESTAMP+DAY), reminder.getTime().schedule(0L, Bound.count(3)).collect(Collectors.toList()));
 	}
 	
 	@Test
-	void shouldBoundScheduleByCount2() {
+	void shouldBScheduleByCount2() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+4*DAY+1).limit(10).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+4*DAY+1, Bound.count(10)).collect(Collectors.toList()));
 	}
 	
 	@Test
-	void shouldBoundScheduleByCount3() {
+	void shouldBScheduleByCount3() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+4*DAY).limit(10).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+5*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+4*DAY, Bound.count(10)).collect(Collectors.toList()));
 	}
 	
 	@Test
-	void shouldBoundScheduleByCount4() {
+	void shouldBScheduleByCount4() {
 		// data
 		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(), reminder.getTime().schedule(TIMESTAMP+7*DAY).limit(10).collect(Collectors.toList()));
+		assertEquals(List.of(), reminder.getTime().schedule(TIMESTAMP+7*DAY, Bound.count(10)).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -255,7 +252,7 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+2*DAY, Bound.count(10)).collect(Collectors.toList()));
 	}
 	
 	@Test
@@ -265,13 +262,13 @@ class DailyRepetitionTest {
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
-		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+2*DAY).limit(10).collect(Collectors.toList()));
+		assertEquals(List.of(TIMESTAMP+4*DAY, TIMESTAMP+6*DAY), reminder.getTime().schedule(TIMESTAMP+2*DAY, Bound.count(10)).collect(Collectors.toList()));
 	}
 	
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder() {
 		// data
-		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(86460L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(86460L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -280,7 +277,7 @@ class DailyRepetitionTest {
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder2() {
 		// data
-		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 86460L, 999999L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(0L, 86460L, 999999L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -289,7 +286,7 @@ class DailyRepetitionTest {
 	@Test
 	void shouldNotAllowExceptionsIfNotPreviouslyOccurring() {
 		// data
-		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(9999999999L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(9999999999L));
 		
 		// verification
 		assertEquals(0, time.getExceptions().size());
@@ -298,7 +295,7 @@ class DailyRepetitionTest {
 	@Test
 	void shouldAllowNullException() {
         // data
-		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, null);
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, null);
 		
 		// verication
 		assertTrue(time.getExceptions().isEmpty());
@@ -315,7 +312,7 @@ class DailyRepetitionTest {
 	    @Test
 	    void shouldAllowAddingException() {
 	        // data
-	        DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+	        DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC);
 	        
 	        // action
 	        boolean result = time.addException(60L);
@@ -328,7 +325,7 @@ class DailyRepetitionTest {
 	    @Test
 	    void shouldNotAllowAddingInexistentExceptions() {
 	         // data
-            DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+            DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC);
             
             // action
             boolean result = time.addException(0L);
@@ -342,8 +339,8 @@ class DailyRepetitionTest {
 	@Nested
 	class AddBounding {
 	    @ParameterizedTest
-	    @ValueSource(longs = {0, -1, -10})
-	    void shouldNotAllowNonPositiveLimitBound(long limit) {
+	    @ValueSource(ints = {0, -1, -10})
+	    void shouldNotAllowNonPositiveLimitBound(int limit) {
 	        // data
 	        Time time = new DailyRepetition(0, 1, Bound.count(limit), ZoneOffset.UTC);
 	        
@@ -378,7 +375,7 @@ class DailyRepetitionTest {
             
             // verification
             assertEquals(0, validator.validate(time).size());
-            assertEquals(List.of(3600L), time.schedule(0, Bound.count(1L)).collect(Collectors.toList()));
+            assertEquals(List.of(3600L), time.schedule(0, Bound.count(1)).collect(Collectors.toList()));
 	    }
 	}
 	
@@ -423,8 +420,8 @@ class DailyRepetitionTest {
             Time result2 = time.truncate(3600L + DAY + 1);
             
             // verification
-            assertEquals(List.of(3600L), result1.schedule().collect(Collectors.toList()));
-            assertEquals(List.of(3600L, 3600L + DAY), result2.schedule().collect(Collectors.toList()));
+            assertEquals(List.of(3600L), result1.schedule(0L, Bound.count(3)).collect(Collectors.toList()));
+            assertEquals(List.of(3600L, 3600L + DAY), result2.schedule(0L, Bound.count(3)).collect(Collectors.toList()));
         }
 	    
 	    @Test
@@ -446,12 +443,12 @@ class DailyRepetitionTest {
 	@Nested
 	class Scheduling {
 	    @Test
-	    void shouldAllowExtraBoundInSchedule() {
+	    void shouldAllowExtraBInSchedule() {
 	        // data
 	        Time time = new DailyRepetition(3600L, 1, Bound.none(), ZoneOffset.UTC);
 	        
 	        // action
-	        Stream<Long> schedule = time.schedule(0L, Bound.count(1L));
+	        Stream<Long> schedule = time.schedule(0L, Bound.count(1));
 	        
 	        // verification
 	        assertEquals(List.of(3600L), schedule.collect(Collectors.toList()));

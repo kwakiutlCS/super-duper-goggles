@@ -3,6 +3,7 @@ package me.ricardo.playground.ir.domain.doubles;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
+import me.ricardo.playground.ir.storage.entity.BoundType;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
@@ -39,7 +40,7 @@ public class ReminderFakes {
         timeEntity.time = 60L;
         timeEntity.step = 1;
         timeEntity.unit = ChronoUnit.DAYS;
-        timeEntity.boundType = 0;
+        timeEntity.boundType = BoundType.NO_BOUND;
         timeEntity.boundValue = 1L;
         timeEntity.zone = "Z";
         

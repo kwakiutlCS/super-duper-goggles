@@ -23,7 +23,7 @@ public class TimeEntity extends PanacheEntity {
 	
 	public String zone;
 	
-	public Integer boundType;
+	public BoundType boundType;
 	
 	public Long boundValue;
 	

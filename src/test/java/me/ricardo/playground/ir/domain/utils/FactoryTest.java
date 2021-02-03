@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.utils.Factory;
 
-public class FactoryTest {
+class FactoryTest {
 
 	Factory factory = new Factory();
 	

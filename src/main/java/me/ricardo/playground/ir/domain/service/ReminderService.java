@@ -13,11 +13,10 @@ import javax.validation.constraints.NotNull;
 
 import me.ricardo.playground.ir.domain.adapter.ReminderAdapter;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
+import me.ricardo.playground.ir.domain.entity.bound.GuaranteedBound;
 import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.domain.operator.Field;
-import me.ricardo.playground.ir.domain.validation.Bounded;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
@@ -35,7 +34,7 @@ public class ReminderService {
 	}
 
 	
-	public List<Long> getSchedule(long id, String user, long start, @NotNull @Bounded @Valid SingleBound bound) {
+	public List<Long> getSchedule(long id, String user, long start, @NotNull @Valid GuaranteedBound bound) {
 		return reminderRepository.findByIdOptional(id)
 		                         .filter(r -> r.userId.equals(user))
 		                         .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
