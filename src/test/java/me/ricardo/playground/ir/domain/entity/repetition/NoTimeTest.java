@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.domain.entity.repetion;
+package me.ricardo.playground.ir.domain.entity.repetition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 
 class NoTimeTest {
 

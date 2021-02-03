@@ -1,4 +1,6 @@
-package me.ricardo.playground.ir.domain.entity.repetion;
+package me.ricardo.playground.ir.domain.entity.repetition;
+
+import static java.util.stream.Collectors.toCollection;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -21,7 +23,7 @@ import me.ricardo.playground.ir.domain.validation.StartEndConsistent;
 import me.ricardo.playground.ir.utils.Utils;
 
 @StartEndConsistent
-public final class DailyRepetion implements Time {
+public final class DailyRepetition implements Time {
 
     @PositiveOrZero
 	private final long start;
@@ -37,15 +39,15 @@ public final class DailyRepetion implements Time {
 	
 	private final Set<Long> exceptions;
 	
-	public DailyRepetion(long start) {
+	public DailyRepetition(long start) {
 		this(start, 1, Bound.none(), ZoneOffset.UTC);
 	}
 	
-	public DailyRepetion(long start, int step, SingleBound bound, ZoneId zone) {
+	public DailyRepetition(long start, int step, SingleBound bound, ZoneId zone) {
 		this(start, step, bound, zone, new HashSet<>());
 	}
 	
-	public DailyRepetion(long start, int step, SingleBound bound, ZoneId zone, Set<Long> exceptions) {
+	public DailyRepetition(long start, int step, SingleBound bound, ZoneId zone, Set<Long> exceptions) {
 		this.start = Utils.truncateToMinute(start);
 		this.bound = bound != null ? bound : Bound.none();
 		this.step = step;
@@ -101,7 +103,7 @@ public final class DailyRepetion implements Time {
         if (timestamp <= start)
             return NoTime.INSTANCE;
         
-        return new DailyRepetion(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
+        return new DailyRepetition(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
     }	
     
 	private Stream<Long> scheduleBeforeExceptions(long offset, Bound externalBound) {
@@ -131,7 +133,7 @@ public final class DailyRepetion implements Time {
 	private Set<Long> filterValidExceptions(Set<Long> exceptions) {
 		return exceptions.stream()
 		                 .filter(this::isExceptionValid)
-		                 .collect(Collectors.toSet());
+		                 .collect(toCollection(HashSet::new));
 	}
 	
 	

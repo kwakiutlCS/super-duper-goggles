@@ -17,10 +17,11 @@ import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
-import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
-import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
+import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 
@@ -37,13 +38,28 @@ class ReminderCrudIT {
 	@ExpectedDataSet(value = "expected/simple_reminder.yml")
 	void shouldCreateReminder() {
 		// data
-		Reminder reminder = Reminder.Builder.start().withContent("content").withMetadata(Metadata.of(0L)).withUser("user").build();
+		Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
 		
 		// action
 		Reminder result = crud.createReminder(reminder);
 		
 		// verification
 		assertEquals(1, result.getId());
+	}
+	
+	@Test
+	@DataSet(cleanBefore = true)
+	@ExpectedDataSet(value = "expected/daily_repetition_reminder.yml")
+	void shouldCreateTimeReminder() {
+	    // data
+	    Time time = new DailyRepetition(90060L);
+	    Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+	    
+	    // action
+	    Reminder result = crud.createReminder(reminder);
+	    
+	    // verification
+	    assertEquals("content", result.getContent());
 	}
 	
 	@Test

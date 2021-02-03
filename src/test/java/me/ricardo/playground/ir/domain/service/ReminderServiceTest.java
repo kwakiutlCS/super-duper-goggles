@@ -25,8 +25,8 @@ import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
-import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
-import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
@@ -56,7 +56,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldRetrieveReminderSchedule() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			Reminder result = crud.createReminder(reminder);
@@ -73,7 +73,7 @@ class ReminderServiceTest {
 		@Test
         void shouldRetrieveReminderScheduleWithExceptions() {
             // data
-            Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC, Set.of(60L + 86400));
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC, Set.of(60L + 86400));
             Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
             Reminder result = crud.createReminder(reminder);
@@ -89,7 +89,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldRetrieveReminderScheduleWithLimit() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			Reminder result = crud.createReminder(reminder);
@@ -105,7 +105,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldNotRetrieveReminderScheduleFromDifferentUser() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			Reminder result = crud.createReminder(reminder);
@@ -120,7 +120,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldNotRetrieveNonExistentReminderSchedule() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			crud.createReminder(reminder);
@@ -137,7 +137,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldNotRetrieveSchedulerWithoutBound() throws NoSuchMethodException, SecurityException {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			crud.createReminder(reminder);
@@ -149,7 +149,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldNotRetrieveSchedulerWithNullBound() throws NoSuchMethodException, SecurityException {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
 			crud.createReminder(reminder);
@@ -161,7 +161,7 @@ class ReminderServiceTest {
 		@Test
         void shouldNotRetrieveSchedulerWithNegativeCountBound() throws NoSuchMethodException, SecurityException {
             // data
-            Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
             Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
             crud.createReminder(reminder);
@@ -173,7 +173,7 @@ class ReminderServiceTest {
 		@Test
         void shouldNotRetrieveSchedulerWithNegativeTimeBound() throws NoSuchMethodException, SecurityException {
             // data
-            Time time = new DailyRepetion(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
             Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
             crud.createReminder(reminder);
@@ -185,7 +185,7 @@ class ReminderServiceTest {
 		@Test
 		void shouldBeAbleToAddExtraBound() {
 		    // data
-            Time time = new DailyRepetion(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(60L));
+            Time time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(60L));
             Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
             Reminder result = crud.createReminder(reminder);

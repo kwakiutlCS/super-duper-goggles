@@ -1,5 +1,5 @@
 reminder:
-- id: 1
+- id: "regex:\\d+"
   content: content
   userId: user
   createdAt: 1000

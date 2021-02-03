@@ -1,0 +1,13 @@
+reminder:
+- id: "regex:\\d+"
+  content: content
+  userId: user
+  createdAt: 1000
+  updatedAt: 1000
+time:
+- id: "regex:\\d+"
+  time: 90060
+  minute: 3660
+  unit: 7
+  step: 1
+  zone: Z

@@ -9,8 +9,8 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Positive;
 import javax.validation.groups.Default;
 
-import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
-import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 
 public class Reminder {
@@ -26,7 +26,6 @@ public class Reminder {
 	@NotNull
 	private final String content;
 
-	@NotNull
 	private final Metadata metadata;
 	
 	@Valid

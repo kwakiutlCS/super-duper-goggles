@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
-import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
 import me.ricardo.playground.ir.domain.validation.StartEndConsistent.StartEndConsistentValidator;
 
 @Documented
@@ -28,10 +28,10 @@ public @interface StartEndConsistent {
     Class<? extends Payload>[] payload() default {};
     
     
-    class StartEndConsistentValidator implements ConstraintValidator<StartEndConsistent, DailyRepetion> {
+    class StartEndConsistentValidator implements ConstraintValidator<StartEndConsistent, DailyRepetition> {
         
         @Override
-        public boolean isValid(final DailyRepetion value, final ConstraintValidatorContext context) {
+        public boolean isValid(final DailyRepetition value, final ConstraintValidatorContext context) {
         	boolean valid = true;
         	
         	if (value != null && value.getBound() != null && value.getBound().type() == BoundType.TIMESTAMP_BOUND && value.getBound().timestamp() <= value.getStart()) {

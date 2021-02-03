@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.domain.entity.repetion;
+package me.ricardo.playground.ir.domain.entity.repetition;
 
 import java.util.stream.Stream;
 

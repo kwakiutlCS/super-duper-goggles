@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.domain.entity.repetion;
+package me.ricardo.playground.ir.domain.entity.repetition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,9 +21,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
+import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 
 
-class DailyRepetionTest {
+class DailyRepetitionTest {
 
 	private static final long TIMESTAMP = 1020L;
 	
@@ -34,7 +38,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldHaveUnboundedOneDayRepetion() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP);
+		Time time = new DailyRepetition(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -44,7 +48,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldHaveExceptionsToSchedule() {
 	    // data
-	    Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(3), ZoneOffset.UTC, Set.of(TIMESTAMP));
+	    Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(3), ZoneOffset.UTC, Set.of(TIMESTAMP));
 	    Reminder reminder = Reminder.Builder.start().withTime(time).build();
 	    
 	    // verification
@@ -54,7 +58,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldHaveBoundedOneDayRepetion() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -64,7 +68,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldHaveBoundedOneDayRepetion2() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.timestamp(TIMESTAMP + 100000L), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -74,7 +78,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldHaveMultipleDayRepetion() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 2, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 2, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -84,7 +88,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldOneDayRepetionFromStartingPoint() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP);
+		Time time = new DailyRepetition(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -94,7 +98,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldOneDayRepetionFromStartingPoint2() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP);
+		Time time = new DailyRepetition(TIMESTAMP);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -104,7 +108,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldMultipleDayRepetionFromStartingPoint() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -114,7 +118,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldMultipleDayRepetionFromStartingPoint2() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -124,7 +128,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldMultipleDayRepetionFromStartingPoint3() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -134,7 +138,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldMultipleDayRepetionFromStartingPoint4() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -144,7 +148,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldMultipleDayRepetionFromStartingPointIntegerStep() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.none(), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -154,7 +158,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldScheduleInDaySavingsChanges() {
 		// data
-		Time time = new DailyRepetion(0, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Time time = new DailyRepetition(0, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -166,7 +170,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldScheduleInDaySavingsChanges2() {
 		// data
-		Time time = new DailyRepetion(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Time time = new DailyRepetition(922334400, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -178,7 +182,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldScheduleInDaySavingsChanges3() {
 		// data
-		Time time = new DailyRepetion(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+		Time time = new DailyRepetition(1601514120, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -207,7 +211,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldBoundScheduleByCount() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(2), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -217,7 +221,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldBoundScheduleByCount2() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -227,7 +231,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldBoundScheduleByCount3() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -237,7 +241,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldBoundScheduleByCount4() {
 		// data
-		Time time = new DailyRepetion(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC);
+		Time time = new DailyRepetition(TIMESTAMP, 3, Bound.count(3), ZoneOffset.UTC);
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -247,7 +251,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAllowCancelSpecificIterationOfReminder() {
 		// data
-		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		DailyRepetition time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneOffset.UTC, Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -257,7 +261,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAllowCancelSpecificIterationOfReminder2() {
 		// data
-		DailyRepetion time = new DailyRepetion(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
+		DailyRepetition time = new DailyRepetition(TIMESTAMP, 1, Bound.count(7), ZoneId.of("Europe/Lisbon"), Set.of(2*DAY+TIMESTAMP, 3*DAY+TIMESTAMP, 5*DAY+TIMESTAMP));
 		Reminder reminder = Reminder.Builder.start().withTime(time).build();
 		
 		// verification
@@ -267,7 +271,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder() {
 		// data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(86460L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(86460L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -276,7 +280,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAddAndRetrieveExceptionsToDailyReminder2() {
 		// data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 86460L, 999999L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(0L, 86460L, 999999L));
 		
 		// verification
 		assertEquals(86460, time.getExceptions().toArray(new Long[1])[0]);
@@ -285,7 +289,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldNotAllowExceptionsIfNotPreviouslyOccurring() {
 		// data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(9999999999L));
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, Set.of(9999999999L));
 		
 		// verification
 		assertEquals(0, time.getExceptions().size());
@@ -294,7 +298,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldAllowNullException() {
         // data
-		DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC, null);
+		DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC, null);
 		
 		// verication
 		assertTrue(time.getExceptions().isEmpty());
@@ -303,7 +307,7 @@ class DailyRepetionTest {
 	@Test
 	void shouldNotAllowNullZone() {
 	    // verification
-        assertEquals(1, validator.validateValue(DailyRepetion.class, "zone", null).size());
+        assertEquals(1, validator.validateValue(DailyRepetition.class, "zone", null).size());
 	}
 	
 	@Nested
@@ -311,7 +315,7 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldAllowAddingException() {
 	        // data
-	        DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+	        DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
 	        
 	        // action
 	        boolean result = time.addException(60L);
@@ -324,7 +328,7 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldNotAllowAddingInexistentExceptions() {
 	         // data
-            DailyRepetion time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+            DailyRepetition time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
             
             // action
             boolean result = time.addException(0L);
@@ -341,7 +345,7 @@ class DailyRepetionTest {
 	    @ValueSource(longs = {0, -1, -10})
 	    void shouldNotAllowNonPositiveLimitBound(long limit) {
 	        // data
-	        Time time = new DailyRepetion(0, 1, Bound.count(limit), ZoneOffset.UTC);
+	        Time time = new DailyRepetition(0, 1, Bound.count(limit), ZoneOffset.UTC);
 	        
 	        // verification
 	        assertEquals(1, validator.validate(time).size());
@@ -351,7 +355,7 @@ class DailyRepetionTest {
         @ValueSource(longs = {0, -1, -10})
         void shouldNotAllowNonPositiveTimestampBound(long timestamp) {
 	        // data
-            Time time = new DailyRepetion(0, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
+            Time time = new DailyRepetition(0, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
             
             // verification
             assertEquals(2, validator.validate(time).size());
@@ -361,7 +365,7 @@ class DailyRepetionTest {
         @ValueSource(longs = {3600, 3000})
         void shouldNotAllowBoundTimestampSmallerOrEqualThanStart(long timestamp) {
 	        // data
-	        DailyRepetion time = new DailyRepetion(3600L, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
+	        DailyRepetition time = new DailyRepetition(3600L, 1, Bound.timestamp(timestamp), ZoneOffset.UTC);
 	        
             // verification
             assertEquals(1, validator.validate(time).size());
@@ -370,7 +374,7 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldAllowNullBound() {
 	        // data
-            DailyRepetion time = new DailyRepetion(3600L, 1, null, ZoneOffset.UTC);
+            DailyRepetition time = new DailyRepetition(3600L, 1, null, ZoneOffset.UTC);
             
             // verification
             assertEquals(0, validator.validate(time).size());
@@ -384,7 +388,7 @@ class DailyRepetionTest {
         @ValueSource(longs = {-60, -1})
         void shouldNotAllowNegativeStart(long start) {
             // verification
-            assertEquals(1, validator.validateValue(DailyRepetion.class, "start", start).size());
+            assertEquals(1, validator.validateValue(DailyRepetition.class, "start", start).size());
         }
 	}
 	
@@ -394,7 +398,7 @@ class DailyRepetionTest {
         @ValueSource(ints = {0, -1, -10})
         void shouldNotAllowNonPositiveStep(int step) {
             // verification
-            assertEquals(1, validator.validateValue(DailyRepetion.class, "step", step).size());
+            assertEquals(1, validator.validateValue(DailyRepetition.class, "step", step).size());
         }
     }
 	
@@ -403,7 +407,7 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldRemoveIfTruncationIsBeforeStart() {
 	        // data
-	        Time time = new DailyRepetion(3600L, 1, Bound.none(), ZoneOffset.UTC);
+	        Time time = new DailyRepetition(3600L, 1, Bound.none(), ZoneOffset.UTC);
 	        
 	        // verification
 	        assertEquals(NoTime.INSTANCE, time.truncate(3600L));
@@ -412,7 +416,7 @@ class DailyRepetionTest {
 	    @Test
         void shouldTruncate() {
             // data
-            Time time = new DailyRepetion(3600L, 1, Bound.none(), ZoneOffset.UTC);
+            Time time = new DailyRepetition(3600L, 1, Bound.none(), ZoneOffset.UTC);
             
             // action
             Time result1 = time.truncate(3600L + DAY);
@@ -426,16 +430,16 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldRemoveExtraExceptions() {
 	        // data
-            DailyRepetion time = new DailyRepetion(3600L, 1, Bound.none(), ZoneOffset.UTC, Set.of(3600L + DAY, 3600L + 3 * DAY));
+            DailyRepetition time = new DailyRepetition(3600L, 1, Bound.none(), ZoneOffset.UTC, Set.of(3600L + DAY, 3600L + 3 * DAY));
             
             // action
             Time result = time.truncate(2 * DAY);
             
             // verification
-            assertEquals(time.getStart(), ((DailyRepetion) result).getStart());
-            assertEquals(time.getStep(), ((DailyRepetion) result).getStep());
-            assertEquals(time.getZone(), ((DailyRepetion) result).getZone());
-            assertEquals(Set.of(3600L + DAY), ((DailyRepetion) result).getExceptions());
+            assertEquals(time.getStart(), ((DailyRepetition) result).getStart());
+            assertEquals(time.getStep(), ((DailyRepetition) result).getStep());
+            assertEquals(time.getZone(), ((DailyRepetition) result).getZone());
+            assertEquals(Set.of(3600L + DAY), ((DailyRepetition) result).getExceptions());
 	    }
 	}
 	
@@ -444,7 +448,7 @@ class DailyRepetionTest {
 	    @Test
 	    void shouldAllowExtraBoundInSchedule() {
 	        // data
-	        Time time = new DailyRepetion(3600L, 1, Bound.none(), ZoneOffset.UTC);
+	        Time time = new DailyRepetition(3600L, 1, Bound.none(), ZoneOffset.UTC);
 	        
 	        // action
 	        Stream<Long> schedule = time.schedule(0L, Bound.count(1L));

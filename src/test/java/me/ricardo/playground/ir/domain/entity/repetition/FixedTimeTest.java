@@ -1,4 +1,4 @@
-package me.ricardo.playground.ir.domain.entity.repetion;
+package me.ricardo.playground.ir.domain.entity.repetition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,6 +17,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
+import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 
 class FixedTimeTest {
 

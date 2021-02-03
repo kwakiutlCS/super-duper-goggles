@@ -9,10 +9,10 @@ import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
 import me.ricardo.playground.ir.domain.entity.bound.Bound.BoundType;
 import me.ricardo.playground.ir.domain.entity.bound.Bound.SingleBound;
-import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
-import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
-import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
-import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
+import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.domain.operator.Field;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
@@ -47,8 +47,9 @@ public class ReminderAdapter {
 	public static TimeEntity toStorage(Time time, TimeEntity entity) {
 		if (time instanceof FixedTime f) {
 			entity.time = f.getTime();
-		} else if (time instanceof DailyRepetion d) {
+		} else if (time instanceof DailyRepetition d) {
 			entity.time = d.getStart();
+			entity.minute = d.getStart() % ChronoUnit.DAYS.getDuration().getSeconds();
 			entity.unit = ChronoUnit.DAYS;
 			entity.step = d.getStep();
 			entity.zone = d.getZone().getId();
@@ -104,6 +105,6 @@ public class ReminderAdapter {
 		// optionally lazy load properties
 		Set<Long> exceptions = whitelist.contains(Field.EXCEPTIONS) ? entity.exceptions : Set.of();
 		
-		return new DailyRepetion(entity.time, entity.step, bound, ZoneId.of(entity.zone), exceptions);
+		return new DailyRepetition(entity.time, entity.step, bound, ZoneId.of(entity.zone), exceptions);
 	}
 }

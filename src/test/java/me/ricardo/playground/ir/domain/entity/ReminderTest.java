@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.validation.ReminderUpdate;
 
 class ReminderTest {
@@ -130,13 +130,7 @@ class ReminderTest {
 	    // verification
 	    assertEquals(NoTime.INSTANCE, reminder.getTime());
 	}
-	
-	@Test
-	void shouldNotHaveNullMetadata() {
-	    // verification
-        assertFalse(validator.validateValue(Reminder.class, "metadata", null).isEmpty());
-	}
-	
+
 	@Test
     void shouldNotHaveNullContent() {
         // verification

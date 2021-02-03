@@ -15,6 +15,8 @@ public class TimeEntity extends PanacheEntity {
 
 	public long time;
 	
+	public Long minute;
+	
 	public Integer step;
 	
 	public ChronoUnit unit;

@@ -21,10 +21,10 @@ import me.ricardo.playground.ir.domain.doubles.ReminderFakes;
 import me.ricardo.playground.ir.domain.doubles.ReminderRepositoryFake;
 import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.Bound;
-import me.ricardo.playground.ir.domain.entity.repetion.DailyRepetion;
-import me.ricardo.playground.ir.domain.entity.repetion.FixedTime;
-import me.ricardo.playground.ir.domain.entity.repetion.NoTime;
-import me.ricardo.playground.ir.domain.entity.repetion.Time;
+import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
+import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
+import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
+import me.ricardo.playground.ir.domain.entity.repetition.Time;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 class ReminderCrudTest {
@@ -80,7 +80,7 @@ class ReminderCrudTest {
 		
 		@Test
 		void shouldNotRetrieveExceptionsForReminder() {
-		    assertTrue(((DailyRepetion) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
+		    assertTrue(((DailyRepetition) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
 		}
 	}
 
@@ -116,31 +116,31 @@ class ReminderCrudTest {
 		@Test
 		void shouldCreateDailyRepetionTimeReminderBoundCount() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.count(3L), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.count(3L), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
 			
 			// action
 			Reminder result = crud.createReminder(reminder);
 			
 			// verification
-			assertEquals(1, ((DailyRepetion) result.getTime()).getStep());
-			assertEquals(ZoneOffset.UTC, ((DailyRepetion) result.getTime()).getZone());
-			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
+			assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
+			assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
+			assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
 		}
 		
 		@Test
 		void shouldCreateDailyRepetionTimeReminderBoundTimestamp() {
 			// data
-			Time time = new DailyRepetion(60L, 1, Bound.timestamp(90L), ZoneOffset.UTC);
+			Time time = new DailyRepetition(60L, 1, Bound.timestamp(90L), ZoneOffset.UTC);
 			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
 			
 			// action
 			Reminder result = crud.createReminder(reminder);
 			
 			// verification
-			assertEquals(1, ((DailyRepetion) result.getTime()).getStep());
-			assertEquals(ZoneOffset.UTC, ((DailyRepetion) result.getTime()).getZone());
-			assertEquals(0, ((DailyRepetion) result.getTime()).getExceptions().size());
+			assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
+			assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
+			assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
 		}
 		
 		@Test
@@ -164,7 +164,7 @@ class ReminderCrudTest {
 		@Test
         void shouldNotAllowInvalidStepInDailyRepetionRemider() throws NoSuchMethodException, SecurityException {
             // data
-            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new DailyRepetion(0, 0, Bound.none(), ZoneOffset.UTC)).build();
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new DailyRepetition(0, 0, Bound.none(), ZoneOffset.UTC)).build();
             
             // verification
             assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
