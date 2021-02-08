@@ -29,139 +29,139 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 class ReminderCrudTest {
 
-	private final static long TIMESTAMP = 1000L;
-	
-	private ReminderCrud crud;
-	
-	private ReminderRepository repository;
-	
-	private static ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
+    private final static long TIMESTAMP = 1000L;
+    
+    private ReminderCrud crud;
+    
+    private ReminderRepository repository;
+    
+    private static ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
 
-	@BeforeEach
-	void init() {
-	    repository = new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER(), ReminderFakes.DAILY_REPETION(), ReminderFakes.FIXED_TIME(), ReminderFakes.DAILY_REPETION_WITH_EXCEPTIONS());
-	    crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
-	}
+    @BeforeEach
+    void init() {
+        repository = new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER(), ReminderFakes.DAILY_REPETITION(), ReminderFakes.FIXED_TIME(), ReminderFakes.DAILY_REPETITION_WITH_EXCEPTIONS());
+        crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
+    }
 
-	@Nested
-	class FindReminders {
-		@Test
-		void shouldFindAllReminders() {
-			assertEquals(4, crud.getReminders("user").size());
-		}
+    @Nested
+    class FindReminders {
+        @Test
+        void shouldFindAllReminders() {
+            assertEquals(4, crud.getReminders("user").size());
+        }
 
-		@Test
-		void shouldNotFindRemindersForDifferentUser() {
+        @Test
+        void shouldNotFindRemindersForDifferentUser() {
             assertEquals(0, crud.getReminders("notTheUser").size());
-		}
-	}
-	
-	@Nested
-	class FindReminderById {
-		@Test
-		void shouldFindReminderById() {
-			assertEquals("1", crud.getReminder(1L, "user").get().getContent());
-		}
+        }
+    }
+    
+    @Nested
+    class FindReminderById {
+        @Test
+        void shouldFindReminderById() {
+            assertEquals("1", crud.getReminder(1L, "user").get().getContent());
+        }
 
-		@Test
-		void shouldFindReminderWithoutUser() {
-			assertTrue(crud.getReminder(1L, null).isEmpty());
-		}
+        @Test
+        void shouldFindReminderWithoutUser() {
+            assertTrue(crud.getReminder(1L, null).isEmpty());
+        }
 
-		@Test
-		void shouldNotFindReminderByIdForDifferentUser() {
-			assertTrue(crud.getReminder(1L, "notTheUser").isEmpty());
-		}
+        @Test
+        void shouldNotFindReminderByIdForDifferentUser() {
+            assertTrue(crud.getReminder(1L, "notTheUser").isEmpty());
+        }
 
-		@Test
-		void shouldNotFindNonExistingReminder() {
-			assertTrue(crud.getReminder(999L, "user").isEmpty());
-		}
-		
-		@Test
-		void shouldNotRetrieveExceptionsForReminder() {
-		    assertTrue(((DailyRepetition) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
-		}
-	}
+        @Test
+        void shouldNotFindNonExistingReminder() {
+            assertTrue(crud.getReminder(999L, "user").isEmpty());
+        }
+        
+        @Test
+        void shouldNotRetrieveExceptionsForReminder() {
+            assertTrue(((DailyRepetition) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
+        }
+    }
 
-	@Nested
-	class CreateReminders {
-		@Test
-		void shouldAddCreateTimeAndUpdateTimeToReminderCreated() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withUser("user").build();
-
-			// action
-			Reminder result = crud.createReminder(reminder);
-
-			// verification
-			assertEquals(5L, result.getId());
-			assertEquals(TIMESTAMP, result.getMetadata().createdAt());
-			assertEquals(TIMESTAMP, result.getMetadata().updatedAt());
-		}
-		
-		@Test
-		void shouldCreateFixedTimeReminder() {
-			// data
-			Time time = new FixedTime(60L);
-			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
-			
-			// action
-			Reminder result = crud.createReminder(reminder);
-			
-			// verification
-			assertEquals(60L, ((FixedTime)result.getTime()).getTime());
-		}
-		
-		@Test
-		void shouldCreateDailyRepetionTimeReminderBoundCount() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
-			
-			// action
-			Reminder result = crud.createReminder(reminder);
-			
-			// verification
-			assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
-			assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
-			assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
-		}
-		
-		@Test
-		void shouldCreateDailyRepetionTimeReminderBoundTimestamp() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.timestamp(90L), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
-			
-			// action
-			Reminder result = crud.createReminder(reminder);
-			
-			// verification
-			assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
-			assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
-			assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
-		}
-		
-		@Test
-		void shouldNotAllowIdInReminder() throws NoSuchMethodException, SecurityException {
+    @Nested
+    class CreateReminders {
+        @Test
+        void shouldAddCreateTimeAndUpdateTimeToReminderCreated() {
             // data
-			Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").build();
-			
-			// verification
-			assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
-		}
-		
-		@Test
-		void shouldNotAllowInvalidFixedTimeRemider() throws NoSuchMethodException, SecurityException {
-		    // data
-		    Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new FixedTime(-80)).build();
-		    
-		    // verification
-		    assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
-		}
-		
-		@Test
+            Reminder reminder = Reminder.Builder.start().withUser("user").build();
+
+            // action
+            Reminder result = crud.createReminder(reminder);
+
+            // verification
+            assertEquals(5L, result.getId());
+            assertEquals(TIMESTAMP, result.getMetadata().createdAt());
+            assertEquals(TIMESTAMP, result.getMetadata().updatedAt());
+        }
+        
+        @Test
+        void shouldCreateFixedTimeReminder() {
+            // data
+            Time time = new FixedTime(60L);
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
+            
+            // action
+            Reminder result = crud.createReminder(reminder);
+            
+            // verification
+            assertEquals(60L, ((FixedTime)result.getTime()).getTime());
+        }
+        
+        @Test
+        void shouldCreateDailyRepetionTimeReminderBoundCount() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
+            
+            // action
+            Reminder result = crud.createReminder(reminder);
+            
+            // verification
+            assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
+            assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
+            assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
+        }
+        
+        @Test
+        void shouldCreateDailyRepetionTimeReminderBoundTimestamp() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.timestamp(90L), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(time).build();
+            
+            // action
+            Reminder result = crud.createReminder(reminder);
+            
+            // verification
+            assertEquals(1, ((DailyRepetition) result.getTime()).getStep());
+            assertEquals(ZoneOffset.UTC, ((DailyRepetition) result.getTime()).getZone());
+            assertEquals(0, ((DailyRepetition) result.getTime()).getExceptions().size());
+        }
+        
+        @Test
+        void shouldNotAllowIdInReminder() throws NoSuchMethodException, SecurityException {
+            // data
+            Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").build();
+            
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+        }
+        
+        @Test
+        void shouldNotAllowInvalidFixedTimeRemider() throws NoSuchMethodException, SecurityException {
+            // data
+            Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new FixedTime(-80)).build();
+            
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+        }
+        
+        @Test
         void shouldNotAllowInvalidStepInDailyRepetionRemider() throws NoSuchMethodException, SecurityException {
             // data
             Reminder reminder = Reminder.Builder.start().withUser("user").withTime(new DailyRepetition(0, 0, Bound.none(), ZoneOffset.UTC)).build();
@@ -169,67 +169,67 @@ class ReminderCrudTest {
             // verification
             assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{reminder}).isEmpty());
         }
-	}
-	
-	@Nested
-	class UpdateReminders {
-		@Test
-		void shouldUpdateReminderContent() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
-			long id = crud.createReminder(reminder).getId();
+    }
+    
+    @Nested
+    class UpdateReminders {
+        @Test
+        void shouldUpdateReminderContent() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
+            long id = crud.createReminder(reminder).getId();
 
-			// action
-			ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(id).withContent("updated").build());
+            // action
+            ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
+            Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(id).withContent("updated").build());
 
-			// verification
-			assertEquals(TIMESTAMP, result.get().getMetadata().createdAt());
-			assertEquals(TIMESTAMP + 1, result.get().getMetadata().updatedAt());
-			assertEquals("updated", result.get().getContent());
-			assertEquals(id, result.get().getId());
-		}
+            // verification
+            assertEquals(TIMESTAMP, result.get().getMetadata().createdAt());
+            assertEquals(TIMESTAMP + 1, result.get().getMetadata().updatedAt());
+            assertEquals("updated", result.get().getContent());
+            assertEquals(id, result.get().getId());
+        }
 
-		@Test
-		void shouldNotUpdateReminderForOtherUser() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
-			long id = crud.createReminder(reminder).getId();
+        @Test
+        void shouldNotUpdateReminderForOtherUser() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
+            long id = crud.createReminder(reminder).getId();
 
-			// action
-			ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("notTheUser").withId(id).withContent("updated").build());
+            // action
+            ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
+            Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("notTheUser").withId(id).withContent("updated").build());
 
-			// verification
-			assertTrue(result.isEmpty());
-		}
+            // verification
+            assertTrue(result.isEmpty());
+        }
 
-		@Test
-		void shouldNotUpdateInexistentReminder() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
-			crud.createReminder(reminder);
+        @Test
+        void shouldNotUpdateInexistentReminder() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").build();
+            crud.createReminder(reminder);
 
-			// action
-			ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
-			Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(999L).withContent("updated").build());
+            // action
+            ReminderCrud svc2 = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP + 1), ZoneOffset.UTC));
+            Optional<Reminder> result = svc2.updateReminder(Reminder.Builder.start().withUser("user").withId(999L).withContent("updated").build());
 
-			// verification
-			assertTrue(result.isEmpty());
-		}
-		
-		@Test
-		void shouldRequireIdWhenUpdatingReminder() throws NoSuchMethodException, SecurityException {
-			// data
-			Reminder reminder = Reminder.Builder.start().withUser("user").build();
-						
-			// verification
-			assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{reminder}).isEmpty());
-		}
-		
-		@Test
-		void shouldAllowRemoveTimeInformation() {
-		    // data
+            // verification
+            assertTrue(result.isEmpty());
+        }
+        
+        @Test
+        void shouldRequireIdWhenUpdatingReminder() throws NoSuchMethodException, SecurityException {
+            // data
+            Reminder reminder = Reminder.Builder.start().withUser("user").build();
+                        
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+        }
+        
+        @Test
+        void shouldAllowRemoveTimeInformation() {
+            // data
             Reminder reminder = Reminder.Builder.start().withId(3L).withUser("user").build();
             
             // action
@@ -237,9 +237,9 @@ class ReminderCrudTest {
             
             // verification
             assertEquals(NoTime.INSTANCE, result.get().getTime());
-		}
-		
-		@Test
+        }
+        
+        @Test
         void shouldAllowAddingTimeInformation() {
             // data
             Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").withTime(new FixedTime(3L)).build();
@@ -250,63 +250,63 @@ class ReminderCrudTest {
             // verification
             assertNotNull(result.get().getTime());
         }
-	}
-	
-	
-	@Nested
-	class DeleteReminder {
-		@Test
-		void shouldDeleteReminder() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
-			long id = crud.createReminder(reminder).getId();
+    }
+    
+    
+    @Nested
+    class DeleteReminder {
+        @Test
+        void shouldDeleteReminder() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
+            long id = crud.createReminder(reminder).getId();
 
-			// action
-			boolean result = crud.deleteReminder(id, "user");
+            // action
+            boolean result = crud.deleteReminder(id, "user");
 
-			// verification
-			assertEquals(true, result);
-			assertTrue(crud.getReminder(id, "user").isEmpty());
-		}
+            // verification
+            assertEquals(true, result);
+            assertTrue(crud.getReminder(id, "user").isEmpty());
+        }
 
-		@Test
-		void shouldNotDeleteReminderForOtherUser() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
-			long id = crud.createReminder(reminder).getId();
+        @Test
+        void shouldNotDeleteReminderForOtherUser() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
+            long id = crud.createReminder(reminder).getId();
 
-			// action
-			boolean result = crud.deleteReminder(id, "notTheUser");
+            // action
+            boolean result = crud.deleteReminder(id, "notTheUser");
 
-			// verification
-			assertEquals(false, result);
-		}
+            // verification
+            assertEquals(false, result);
+        }
 
-		@Test
-		void shouldNotDeleteInexistentReminder() {
-			// data
-			Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
-			crud.createReminder(reminder);
+        @Test
+        void shouldNotDeleteInexistentReminder() {
+            // data
+            Reminder reminder = Reminder.Builder.start().withContent("original").withUser("user").build();
+            crud.createReminder(reminder);
 
-			// action
-			boolean result = crud.deleteReminder(999L, "user");
+            // action
+            boolean result = crud.deleteReminder(999L, "user");
 
-			// verification
-			assertEquals(false, result);
-		}
-		
-		@Test
-		void shouldReturnResultFromDeletionOperation() {
-			// data
-			ReminderCrud crud = new ReminderCrud(ReminderRepositoryFake.getNoDelete(), Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
-			Reminder reminder = Reminder.Builder.start().withUser("user").build();
-			crud.createReminder(reminder);
-			
-			// action
-			boolean result = crud.deleteReminder(1L, "user");
-			
-			// verification
-			assertEquals(false, result);
-		}
-	}
+            // verification
+            assertEquals(false, result);
+        }
+        
+        @Test
+        void shouldReturnResultFromDeletionOperation() {
+            // data
+            ReminderCrud crud = new ReminderCrud(ReminderRepositoryFake.getNoDelete(), Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
+            Reminder reminder = Reminder.Builder.start().withUser("user").build();
+            crud.createReminder(reminder);
+            
+            // action
+            boolean result = crud.deleteReminder(1L, "user");
+            
+            // verification
+            assertEquals(false, result);
+        }
+    }
 }

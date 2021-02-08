@@ -26,26 +26,26 @@ public class ReminderService {
     
     public final ReminderCrud crud;
 
-	private final ReminderRepository reminderRepository;
-	
-	public ReminderService(ReminderRepository reminderRepository, ReminderCrud crud) {
-		this.reminderRepository = reminderRepository;
-		this.crud = crud;
-	}
+    private final ReminderRepository reminderRepository;
+    
+    public ReminderService(ReminderRepository reminderRepository, ReminderCrud crud) {
+        this.reminderRepository = reminderRepository;
+        this.crud = crud;
+    }
 
-	
-	public List<Long> getSchedule(long id, String user, long start, @NotNull @Valid GuaranteedBound bound) {
-		return reminderRepository.findByIdOptional(id)
-		                         .filter(r -> r.userId.equals(user))
-		                         .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
-		                         .map(Reminder::getTime)
-		                         .map(t -> t.schedule(start, bound))
-		                         .orElse(Stream.empty())
-		                         .collect(Collectors.toList());
-	}
 
-	
-	@Transactional
+    public List<Long> getSchedule(long id, String user, long start, @NotNull @Valid GuaranteedBound bound) {
+        return reminderRepository.findByIdOptional(id)
+                                 .filter(r -> r.userId.equals(user))
+                                 .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
+                                 .map(Reminder::getTime)
+                                 .map(t -> t.schedule(start, bound))
+                                 .orElse(Stream.empty())
+                                 .collect(Collectors.toList());
+    }
+
+
+    @Transactional
     public boolean addException(long id, String user, long exception) {
         Optional<TimeEntity> entityOptional = reminderRepository.findByIdOptional(id)
                                                                 .filter(r -> r.userId.equals(user))
@@ -66,7 +66,7 @@ public class ReminderService {
     }
 
 
-	@Transactional
+    @Transactional
     public Optional<Reminder> truncate(long id, String user, long timestamp) {
         Optional<ReminderEntity> reminderEntity = reminderRepository.findByIdOptional(id)
                                                                     .filter(e -> e.userId.equals(user));

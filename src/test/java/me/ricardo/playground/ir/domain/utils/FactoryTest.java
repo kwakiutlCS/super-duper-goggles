@@ -11,12 +11,12 @@ import me.ricardo.playground.ir.utils.Factory;
 
 class FactoryTest {
 
-	Factory factory = new Factory();
-	
-	@Test
-	void shouldCreateUTCClock() {
-		Clock clock = factory.getClock();
-		
-		assertEquals(ZoneOffset.UTC, clock.getZone());
-	}
+    Factory factory = new Factory();
+    
+    @Test
+    void shouldCreateUTCClock() {
+        Clock clock = factory.getClock();
+        
+        assertEquals(ZoneOffset.UTC, clock.getZone());
+    }
 }

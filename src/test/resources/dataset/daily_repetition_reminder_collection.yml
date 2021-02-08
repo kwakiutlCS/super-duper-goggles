@@ -8,3 +8,7 @@ reminder:
 time:
 - id: 2
   timestamp: 3600 
+  step: 1
+  unit: DAYS
+  bound_type: NO_BOUND
+  zone: Z

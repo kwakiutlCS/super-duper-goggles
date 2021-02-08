@@ -29,6 +29,4 @@ public sealed interface Bound permits AtomicBound, CompositeBound {
     Bound add(Bound other);
 
     boolean isAfter(long timestamp);
-
-    long getValue();
 }

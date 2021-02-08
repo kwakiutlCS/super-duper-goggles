@@ -1,13 +1,13 @@
 reminder:
 - id: "regex:\\d+"
   content: content
-  userId: user
-  createdAt: 1000
-  updatedAt: 1000
+  user_id: user
+  created_at: 1000
+  updated_at: 1000
 time:
 - id: "regex:\\d+"
-  time: 90060
-  minute: 3660
-  unit: 7
+  timestamp: 90060
+  seconds_in_day: 3660
+  unit: DAYS
   step: 1
   zone: Z

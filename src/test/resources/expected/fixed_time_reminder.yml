@@ -1,9 +1,9 @@
 reminder:
 - id: 1
   content: content
-  userId: user
-  createdAt: 1000
-  updatedAt: 1000
+  user_id: user
+  created_at: 1000
+  updated_at: 1000
 time:
 - id: 2
-  time: 7200
+  timestamp: 7200

@@ -21,51 +21,51 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 @Dependent
 public class ReminderCrud {
 
-	private ReminderRepository reminderRepository;
-	
-	private Clock clock;
-	
-	public ReminderCrud(ReminderRepository reminderRepository, Clock clock) {
-		this.reminderRepository = reminderRepository;
-		this.clock = clock;
-	}
+    private ReminderRepository reminderRepository;
+    
+    private Clock clock;
+    
+    public ReminderCrud(ReminderRepository reminderRepository, Clock clock) {
+        this.reminderRepository = reminderRepository;
+        this.clock = clock;
+    }
 
-	@Transactional
-	public Reminder createReminder(@Valid Reminder reminder) {
-		ReminderEntity entity = ReminderAdapter.toStorage(reminder, Metadata.of(clock.instant().getEpochSecond()));
-		reminderRepository.persist(entity);
+    @Transactional
+    public Reminder createReminder(@Valid Reminder reminder) {
+        ReminderEntity entity = ReminderAdapter.toStorage(reminder, Metadata.of(clock.instant().getEpochSecond()));
+        reminderRepository.persist(entity);
 
-		return ReminderAdapter.fromStorage(entity);
-	}
+        return ReminderAdapter.fromStorage(entity);
+    }
 
-	public List<Reminder> getReminders(String user) {
-		return reminderRepository.findByUser(user)
-				                 .stream()
-				                 .map(ReminderAdapter::fromStorage)
-								 .collect(Collectors.toList());
-	}
+    public List<Reminder> getReminders(String user) {
+        return reminderRepository.findByUser(user)
+                                 .stream()
+                                 .map(ReminderAdapter::fromStorage)
+                                 .collect(Collectors.toList());
+    }
 
-	public Optional<Reminder> getReminder(long id, String user) {
-		return reminderRepository.findByIdOptional(id)
-								 .filter(r -> r.userId.equals(user))
-				                 .map(ReminderAdapter::fromStorage);
-	}
+    public Optional<Reminder> getReminder(long id, String user) {
+        return reminderRepository.findByIdOptional(id)
+                                 .filter(r -> r.userId.equals(user))
+                                 .map(ReminderAdapter::fromStorage);
+    }
 
-	@Transactional
-	public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
-		return reminderRepository.findByIdOptional(reminder.getId())
+    @Transactional
+    public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
+        return reminderRepository.findByIdOptional(reminder.getId())
                                  .filter(r -> r.userId.equals(reminder.getUser()))
                                  .map(e -> ReminderAdapter.toStorage(reminder,
                                                                      Metadata.of(e.createdAt, clock.instant().getEpochSecond()),
                                                                      e))
                                  .map(ReminderAdapter::fromStorage);
-	}
+    }
 
-	@Transactional
-	public boolean deleteReminder(long id, String user) {
-		return reminderRepository.findByIdOptional(id)
-		                         .filter(r -> r.userId.equals(user))
-		                         .map(r -> reminderRepository.deleteById(r.id))
-		                         .orElse(false);
-	}
+    @Transactional
+    public boolean deleteReminder(long id, String user) {
+        return reminderRepository.findByIdOptional(id)
+                                 .filter(r -> r.userId.equals(user))
+                                 .map(r -> reminderRepository.deleteById(r.id))
+                                 .orElse(false);
+    }
 }

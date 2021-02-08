@@ -1,5 +1,6 @@
 package me.ricardo.playground.ir.domain.doubles;
 
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ public class ReminderFakes {
         ReminderEntity reminder = new ReminderEntity();
         
         TimeEntity timeEntity = new TimeEntity();
-        timeEntity.time = 60L;
+        timeEntity.setTimestamp(60L);
         reminder.content = "2";
         reminder.userId = "user";
         reminder.createdAt = 0;
@@ -33,16 +34,16 @@ public class ReminderFakes {
         return reminder;
     }
     
-    public static ReminderEntity DAILY_REPETION() {
+    public static ReminderEntity DAILY_REPETITION() {
         ReminderEntity reminder = new ReminderEntity();
         
         TimeEntity timeEntity = new TimeEntity();
-        timeEntity.time = 60L;
+        timeEntity.setTimestamp(60L);
         timeEntity.step = 1;
         timeEntity.unit = ChronoUnit.DAYS;
         timeEntity.boundType = BoundType.NO_BOUND;
         timeEntity.boundValue = 1L;
-        timeEntity.zone = "Z";
+        timeEntity.setZone(ZoneId.of("Z"));
         
         reminder.content = "3";
         reminder.userId = "user";
@@ -53,9 +54,16 @@ public class ReminderFakes {
         return reminder;
     }
     
-    public static ReminderEntity DAILY_REPETION_WITH_EXCEPTIONS() {
-        ReminderEntity reminder = DAILY_REPETION();
+    public static ReminderEntity DAILY_REPETITION_WITH_EXCEPTIONS() {
+        ReminderEntity reminder = DAILY_REPETITION();
         reminder.time.exceptions = Set.of(60L);
+        
+        return reminder;
+    }
+    
+    public static ReminderEntity DAILY_REPETITION_RECENT() {
+        ReminderEntity reminder = DAILY_REPETITION();
+        reminder.time.setTimestamp(1610000040L);
         
         return reminder;
     }

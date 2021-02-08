@@ -1,16 +1,16 @@
 reminder:
 - id: 1
   content: content
-  userId: user
-  createdAt: 1000
-  updatedAt: 1000
+  user_id: user
+  created_at: 1000
+  updated_at: 1000
   time_id: 2
 time:
 - id: 2
-  time: 3600 
+  timestamp: 3600 
   step: 1
-  unit: 7
-  boundType: 0
+  unit: DAYS
+  bound_type: NO_BOUND
   zone: Z
 exception:
 - time_id: 2

@@ -10,15 +10,17 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 @Entity(name = "Reminder")
 public class ReminderEntity extends PanacheEntity {
 
-	public String content;
-	
-	@Column(nullable = false)
-	public String userId;
-	
-	public long createdAt;
+    public String content;
+    
+    @Column(nullable = false, name = "user_id")
+    public String userId;
+    
+    @Column(nullable = false, name = "created_at")
+    public long createdAt;
 
-	public long updatedAt;
+    @Column(nullable = false, name = "updated_at")
+    public long updatedAt;
 
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-	public TimeEntity time;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    public TimeEntity time;
 }

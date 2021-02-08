@@ -33,45 +33,45 @@ import me.ricardo.playground.ir.storage.repository.ReminderRepository;
 
 class ReminderServiceTest {
 
-	@Nested
-	class ScheduleReminder {
-	    private final static long TIMESTAMP = 1000L;
-	    
-	    private ReminderService svc;
-	    
-	    private ReminderCrud crud;
-	    
-	    private ReminderRepository repository;
-	    
-	    private ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
+    @Nested
+    class ScheduleReminder {
+        private final static long TIMESTAMP = 1000L;
+        
+        private ReminderService svc;
+        
+        private ReminderCrud crud;
+        
+        private ReminderRepository repository;
+        
+        private ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
 
-	    @BeforeEach
-	    void init() {
-	        repository = new ReminderRepositoryFake();
-	        
-	        crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
-	        svc = new ReminderService(repository, crud);
-	    }
-	    
-	    
-		@Test
-		void shouldRetrieveReminderSchedule() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+        @BeforeEach
+        void init() {
+            repository = new ReminderRepositoryFake();
+            
+            crud = new ReminderCrud(repository, Clock.fixed(Instant.ofEpochSecond(TIMESTAMP), ZoneOffset.UTC));
+            svc = new ReminderService(repository, crud);
+        }
+        
+        
+        @Test
+        void shouldRetrieveReminderSchedule() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
-			Reminder result = crud.createReminder(reminder);
+            Reminder result = crud.createReminder(reminder);
 
-			// action
-			List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.timestamp(200000L));
+            // action
+            List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.timestamp(200000L));
 
-			// verification
-			assertEquals(60L, schedule.get(0));
-			assertEquals(86460L, schedule.get(1));
-			assertEquals(172860L, schedule.get(2));
-		}
-		
-		@Test
+            // verification
+            assertEquals(60L, schedule.get(0));
+            assertEquals(86460L, schedule.get(1));
+            assertEquals(172860L, schedule.get(2));
+        }
+        
+        @Test
         void shouldRetrieveReminderScheduleWithExceptions() {
             // data
             Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC, Set.of(60L + 86400));
@@ -87,65 +87,65 @@ class ReminderServiceTest {
             assertEquals(172860L, schedule.get(1));
         }
 
-		@Test
-		void shouldRetrieveReminderScheduleWithLimit() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+        @Test
+        void shouldRetrieveReminderScheduleWithLimit() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
-			Reminder result = crud.createReminder(reminder);
+            Reminder result = crud.createReminder(reminder);
 
-			// action
-			List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.count(1));
+            // action
+            List<Long> schedule = svc.getSchedule(result.getId(), "user", 0, Bound.count(1));
 
-			// verification
-			assertEquals(60L, schedule.get(0));
-			assertEquals(1, schedule.size());
-		}
+            // verification
+            assertEquals(60L, schedule.get(0));
+            assertEquals(1, schedule.size());
+        }
 
-		@Test
-		void shouldNotRetrieveReminderScheduleFromDifferentUser() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+        @Test
+        void shouldNotRetrieveReminderScheduleFromDifferentUser() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
-			Reminder result = crud.createReminder(reminder);
+            Reminder result = crud.createReminder(reminder);
 
-			// action
-			List<Long> schedule = svc.getSchedule(result.getId(), "notTheUser", 0, Bound.timestamp(200000L));
+            // action
+            List<Long> schedule = svc.getSchedule(result.getId(), "notTheUser", 0, Bound.timestamp(200000L));
 
-			// verification
-			assertEquals(0, schedule.size());
-		}
+            // verification
+            assertEquals(0, schedule.size());
+        }
 
-		@Test
-		void shouldNotRetrieveNonExistentReminderSchedule() {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+        @Test
+        void shouldNotRetrieveNonExistentReminderSchedule() {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
-			crud.createReminder(reminder);
+            crud.createReminder(reminder);
 
-			// action
-			List<Long> schedule = svc.getSchedule(999L, "user", 0, Bound.timestamp(200000L));
+            // action
+            List<Long> schedule = svc.getSchedule(999L, "user", 0, Bound.timestamp(200000L));
 
-			// verification
-			assertEquals(0, schedule.size());
-		}
-		
-		@Test
-		void shouldNotRetrieveSchedulerWithNullBound() throws NoSuchMethodException, SecurityException {
-			// data
-			Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
-			Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
+            // verification
+            assertEquals(0, schedule.size());
+        }
+        
+        @Test
+        void shouldNotRetrieveSchedulerWithNullBound() throws NoSuchMethodException, SecurityException {
+            // data
+            Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
+            Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
-			crud.createReminder(reminder);
+            crud.createReminder(reminder);
 
-			// verification
+            // verification
             assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, null}).size());
-		}
-		
-		@Test
+        }
+        
+        @Test
         void shouldNotRetrieveSchedulerWithNegativeCountBound() throws NoSuchMethodException, SecurityException {
             // data
             Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
@@ -156,8 +156,8 @@ class ReminderServiceTest {
             // verification
             assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, Bound.count(-1)}).size());
         }
-		
-		@Test
+        
+        @Test
         void shouldNotRetrieveSchedulerWithNegativeTimeBound() throws NoSuchMethodException, SecurityException {
             // data
             Time time = new DailyRepetition(60L, 1, Bound.none(), ZoneOffset.UTC);
@@ -168,10 +168,10 @@ class ReminderServiceTest {
             // verification
             assertEquals(1, validator.validateParameters(svc, ReminderService.class.getMethod("getSchedule", long.class, String.class, long.class, GuaranteedBound.class), new Object[] {999L, "user", 0, Bound.timestamp(-1)}).size());
         }
-		
-		@Test
-		void shouldBeAbleToAddExtraBound() {
-		    // data
+        
+        @Test
+        void shouldBeAbleToAddExtraBound() {
+            // data
             Time time = new DailyRepetition(60L, 1, Bound.count(3), ZoneOffset.UTC, Set.of(60L));
             Reminder reminder = Reminder.Builder.start().withContent("content").withUser("user").withTime(time).build();
 
@@ -184,50 +184,50 @@ class ReminderServiceTest {
             // verification
             assertEquals(1, schedule1.size()); // request has limit of 2, only shows 1 because of 1 exception
             assertEquals(2, schedule2.size()); // reminder has limit of 3, only shows 2 because of 1 exception
-		}
-	}
-	
-	@Nested
-	class AddException {
-	    @Test
-	    void shouldAddException() {
-	        // data
-	        ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETION()), null);
+        }
+    }
+    
+    @Nested
+    class AddException {
+        @Test
+        void shouldAddException() {
+            // data
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETITION()), null);
 
-	        // action
-	        boolean result = svc.addException(1L, "user", 60L);
+            // action
+            boolean result = svc.addException(1L, "user", 60L);
 
-	        // verification
-	        assertTrue(result);
-	    }
+            // verification
+            assertTrue(result);
+        }
 
-	    @Test
-	    void shouldNotAddInexistentException() {
-	        // data
-            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETION()), null);
+        @Test
+        void shouldNotAddInexistentException() {
+            // data
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETITION()), null);
 
             // action
             boolean result = svc.addException(1L, "user", 0L);
             
-	        // verification
-	        assertFalse(result);
-	    }
+            // verification
+            assertFalse(result);
+        }
 
-	    @Test
-	    void shouldNotAddExceptionForOtherUser() {
-	        // data
-            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETION()), null);
+        @Test
+        void shouldNotAddExceptionForOtherUser() {
+            // data
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETITION()), null);
 
             // action
             boolean result = svc.addException(1L, "notTheUser", 60L);
 
-	        // verification
-	        assertFalse(result);
-	    }
-	    
-	    @Test
-	    void shouldNotAllowAddingExceptionForFixedTimeReminder() {
-	        // data
+            // verification
+            assertFalse(result);
+        }
+        
+        @Test
+        void shouldNotAllowAddingExceptionForFixedTimeReminder() {
+            // data
             ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.FIXED_TIME()), null);
 
             // action
@@ -235,11 +235,11 @@ class ReminderServiceTest {
             
             // verification
             assertFalse(result);
-	    }
-	    
-	    @Test
+        }
+        
+        @Test
         void shouldNotAllowAddingExceptionForNonTimeReminder() {
-	        // data
+            // data
             ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.SIMPLE_REMINDER()), null);
 
             // action
@@ -248,10 +248,10 @@ class ReminderServiceTest {
             // verification
             assertFalse(result);
         }
-	    
-	    @Test
+        
+        @Test
         void shouldNotAddExceptionForInexistentReminder() {
-	        // data
+            // data
             ReminderService svc = new ReminderService(new ReminderRepositoryFake(), null);
 
             // action
@@ -260,86 +260,86 @@ class ReminderServiceTest {
             // verification
             assertFalse(result);
         }
-	}
-	
-	@Nested
-	class TruncateReminder {
-	    @Test
-	    void shouldBeAbleToTruncateReminder() {
-	        // data
-	        ReminderEntity reminder = ReminderFakes.DAILY_REPETION();
-	        ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
-	        long timestamp = 1036860;
-	        assertEquals(List.of(1036860L), ReminderAdapter.fromStorage(reminder).getTime().schedule(timestamp, Bound.count(Integer.MAX_VALUE)).limit(1).collect(Collectors.toList()));
-	        
-	        // action
-	        Reminder result = svc.truncate(1L, "user", timestamp).get();
-	        
-	        // verification
-	        assertEquals(reminder.id, result.getId());
-	        assertEquals(reminder.content, result.getContent());
-	        assertEquals(reminder.createdAt, result.getMetadata().createdAt());
-	        assertEquals(BoundType.TIMESTAMP_BOUND, reminder.time.boundType);
-	        assertEquals(List.of(), result.getTime().schedule(timestamp, Bound.count(1)).collect(Collectors.toList()));
-	    }
-	    
-	    @Test
+    }
+    
+    @Nested
+    class TruncateReminder {
+        @Test
+        void shouldBeAbleToTruncateReminder() {
+            // data
+            ReminderEntity reminder = ReminderFakes.DAILY_REPETITION();
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
+            long timestamp = 1036860;
+            assertEquals(List.of(1036860L), ReminderAdapter.fromStorage(reminder).getTime().schedule(timestamp, Bound.count(Integer.MAX_VALUE)).limit(1).collect(Collectors.toList()));
+            
+            // action
+            Reminder result = svc.truncate(1L, "user", timestamp).get();
+            
+            // verification
+            assertEquals(reminder.id, result.getId());
+            assertEquals(reminder.content, result.getContent());
+            assertEquals(reminder.createdAt, result.getMetadata().createdAt());
+            assertEquals(BoundType.TIME_BOUND, reminder.time.boundType);
+            assertEquals(List.of(), result.getTime().schedule(timestamp, Bound.count(1)).collect(Collectors.toList()));
+        }
+        
+        @Test
         void shouldReturnNothingWhenDailyRepetionTruncatedBefore() {
             // data
-            ReminderEntity reminder = ReminderFakes.DAILY_REPETION();
+            ReminderEntity reminder = ReminderFakes.DAILY_REPETITION();
             ReminderRepository repository = new ReminderRepositoryFake(reminder);
             ReminderCrud crud = new ReminderCrud(repository, null);
             ReminderService svc = new ReminderService(repository, crud);
             
             // action
-            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.time);
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp());
             
             // verification
             assertEquals(Optional.empty(), result);
         }
-	    
-	    @Test
-	    void shouldNotReturnInexistentReminder() {
-	        // data
-	        ReminderService svc = new ReminderService(new ReminderRepositoryFake(), null);
-	        
-	        // verification
-	        assertEquals(Optional.empty(), svc.truncate(999L, "user", 0L));
-	    }
-	    
-	    @Test
+        
+        @Test
+        void shouldNotReturnInexistentReminder() {
+            // data
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(), null);
+            
+            // verification
+            assertEquals(Optional.empty(), svc.truncate(999L, "user", 0L));
+        }
+        
+        @Test
         void shouldNotReturnOtherUserReminder() {
             // data
-            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETION()), null);
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(ReminderFakes.DAILY_REPETITION()), null);
             
             // verification
             assertEquals(Optional.empty(), svc.truncate(1L, "notTheUser", 0L));
         }
-	    
-	    @Test
+        
+        @Test
         void shouldReturnReminderWithoutTimeUnchanged() {
             // data
-	        ReminderEntity reminder = ReminderFakes.SIMPLE_REMINDER();
+            ReminderEntity reminder = ReminderFakes.SIMPLE_REMINDER();
             ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
             
             // verification
             assertEquals(Optional.of(ReminderAdapter.fromStorage(reminder)), svc.truncate(1L, "user", 0L));
         }
-	    
-	    @Test
-	    void shouldReturnFixedTimeUnchangedWhenTruncatedAfter() {
-	        // data
-	        ReminderEntity reminder = ReminderFakes.FIXED_TIME();
-	        ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
-	        
-	        // action
-	        Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.time + 1);
-	        
-	        // verification
-	        assertEquals(Optional.of(ReminderAdapter.fromStorage(reminder)), result);
-	    }
-	    
-	    @Test
+        
+        @Test
+        void shouldReturnFixedTimeUnchangedWhenTruncatedAfter() {
+            // data
+            ReminderEntity reminder = ReminderFakes.FIXED_TIME();
+            ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
+            
+            // action
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp() + 1);
+            
+            // verification
+            assertEquals(Optional.of(ReminderAdapter.fromStorage(reminder)), result);
+        }
+        
+        @Test
         void shouldReturnNothingWhenFixedTimeTruncatedBefore() {
             // data
             ReminderEntity reminder = ReminderFakes.FIXED_TIME();
@@ -348,10 +348,10 @@ class ReminderServiceTest {
             ReminderService svc = new ReminderService(repository, crud);
             
             // action
-            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.time);
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp());
             
             // verification
             assertEquals(Optional.empty(), result);
         }
-	}
+    }
 }

@@ -31,15 +31,15 @@ public @interface StartEndConsistent {
         
         @Override
         public boolean isValid(final DailyRepetition value, final ConstraintValidatorContext context) {
-        	boolean valid = true;
-        	
-        	if (value != null && !value.getBound().isAfter(value.getStart())) {
-        	    valid = false;
-        	    context.disableDefaultConstraintViolation();
-        	    context.buildConstraintViolationWithTemplate("must have timestamp bound after start value").addConstraintViolation();
-        	}
+            boolean valid = true;
+            
+            if (value != null && !value.getBound().isAfter(value.getStart())) {
+                valid = false;
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("must have timestamp bound after start value").addConstraintViolation();
+            }
 
-        	return valid;
+            return valid;
         }
     }
 }

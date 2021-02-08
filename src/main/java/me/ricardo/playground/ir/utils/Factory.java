@@ -7,9 +7,9 @@ import javax.enterprise.inject.Produces;
 
 public class Factory {
 
-	@Produces
-	@ApplicationScoped
-	public Clock getClock() {
-		return Clock.systemUTC();
-	}
+    @Produces
+    @ApplicationScoped
+    public Clock getClock() {
+        return Clock.systemUTC();
+    }
 }

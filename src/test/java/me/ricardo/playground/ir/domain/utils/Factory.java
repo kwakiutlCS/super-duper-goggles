@@ -13,9 +13,9 @@ import javax.enterprise.inject.Produces;
 @Alternative
 public class Factory {
 
-	@Produces
-	@ApplicationScoped
-	public Clock getClock() {
-		return Clock.fixed(Instant.ofEpochSecond(1000L), ZoneOffset.UTC);
-	}
+    @Produces
+    @ApplicationScoped
+    public Clock getClock() {
+        return Clock.fixed(Instant.ofEpochSecond(1000L), ZoneOffset.UTC);
+    }
 }
