@@ -456,4 +456,37 @@ class DailyRepetitionTest {
             assertEquals(List.of(3600L), schedule.collect(Collectors.toList()));
         }
     }
+    
+    @Nested
+    class GapOverlapDayLightSavings {
+        @Test
+        void shouldScheduleCorrectlyInGap() {
+            // data
+            Time time = new DailyRepetition(1616722200, 1, Bound.none(), ZoneId.of("Europe/Lisbon")); // 1h30 daily schedule
+            
+            // action
+            List<Long> schedule = time.schedule(0, Bound.count(4)).collect(Collectors.toList());
+            
+            // verification
+            assertEquals(1616722200, schedule.get(0));
+            assertEquals(1616808600, schedule.get(1));
+            assertEquals(1616977800, schedule.get(2)); // skips day 28 because gap occurs from 1h to 2h
+            assertEquals(1617064200, schedule.get(3));
+        }
+        
+        @Test
+        void shouldScheduleCorrectlyInOverlap() {
+            // data
+            Time time = new DailyRepetition(1635553800, 1, Bound.none(), ZoneId.of("Europe/Lisbon"));
+            
+            // action
+            List<Long> schedule = time.schedule(0, Bound.count(4)).collect(Collectors.toList());
+            
+            // verification
+            assertEquals(1635553800, schedule.get(0));
+            assertEquals(1635640200, schedule.get(1));
+            assertEquals(1635730200, schedule.get(2));
+            assertEquals(1635816600, schedule.get(3));
+        }
+    }
 }

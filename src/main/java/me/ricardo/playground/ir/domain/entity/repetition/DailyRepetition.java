@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import javax.validation.Valid;
@@ -39,6 +40,8 @@ public final class DailyRepetition implements Time {
     
     private final Set<Long> exceptions;
     
+    private final int hour;
+    
     public DailyRepetition(long start) {
         this(start, 1, Bound.none(), ZoneOffset.UTC);
     }
@@ -52,6 +55,7 @@ public final class DailyRepetition implements Time {
         this.bound = bound != null ? bound : Bound.none();
         this.step = step;
         this.zone = zone;
+        this.hour = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone).getHour();
         this.exceptions = exceptions == null ? new HashSet<>() : filterValidExceptions(exceptions);
     }
 
@@ -97,16 +101,17 @@ public final class DailyRepetition implements Time {
         return new DailyRepetition(start, step, Bound.timestamp(timestamp-1), zone, exceptions);
     }    
     
+    
     private Stream<Long> scheduleBeforeExceptions(long offset, GuaranteedBound externalBound) {
         var startDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(start), zone);
         
         var iterations = calculateNumberIterations(startDate, offset);
         
-        var lowerBound = startDate.plusDays(iterations * step);
-        
-        var noBoundSchedule = Stream.iterate(lowerBound, v -> v.plusDays(step))
-                                       .map(ZonedDateTime::toEpochSecond);
-        
+        var noBoundSchedule = LongStream.iterate(iterations * step, v -> v + step)
+                                        .mapToObj(startDate::plusDays)
+                                        .filter(d -> d.getHour() == hour)
+                                        .map(ZonedDateTime::toEpochSecond);
+                 
         return bound.add(externalBound).apply(noBoundSchedule, iterations);
     }
     
