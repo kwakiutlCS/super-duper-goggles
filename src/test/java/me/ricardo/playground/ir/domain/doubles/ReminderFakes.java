@@ -42,7 +42,6 @@ public class ReminderFakes {
         timeEntity.step = 1;
         timeEntity.unit = ChronoUnit.DAYS;
         timeEntity.boundType = BoundType.NO_BOUND;
-        timeEntity.boundValue = 1L;
         timeEntity.setZone(ZoneId.of("Z"));
         
         reminder.content = "3";

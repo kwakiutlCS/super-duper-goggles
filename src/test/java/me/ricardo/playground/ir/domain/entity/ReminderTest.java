@@ -109,9 +109,25 @@ class ReminderTest {
         Reminder reminder5 = Reminder.Builder.start().build();
         
         // verification
+        assertNotEquals(reminder1, null);
         assertEquals(reminder1, reminder2);
         assertNotEquals(reminder1, reminder3);
         assertEquals(reminder4, reminder5);
+    }
+    
+    @Test
+    void shouldHaveIdBasedHashCode() {
+        // data
+        Reminder reminder1 = Reminder.Builder.start().withId(1L).withUser("user").build();
+        Reminder reminder2 = Reminder.Builder.start().withId(1L).build();
+        Reminder reminder3 = Reminder.Builder.start().withId(2L).build();
+        Reminder reminder4 = Reminder.Builder.start().build();
+        Reminder reminder5 = Reminder.Builder.start().build();
+        
+        // verification
+        assertEquals(reminder1.hashCode(), reminder2.hashCode());
+        assertNotEquals(reminder1.hashCode(), reminder3.hashCode());
+        assertEquals(reminder4.hashCode(), reminder5.hashCode());
     }
     
     @Test

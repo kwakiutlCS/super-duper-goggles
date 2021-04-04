@@ -6,8 +6,6 @@ public final class NoBound implements AtomicBound {
 
     public static final NoBound INSTANCE = new NoBound();
     
-    public static final String BOUND_TYPE = "NO_BOUND";
-    
     private NoBound() {}
 
     @Override
@@ -38,10 +36,5 @@ public final class NoBound implements AtomicBound {
     @Override
     public long getValue() {
         return 0;
-    }
-
-    @Override
-    public String getType() {
-        return BOUND_TYPE;
     }
 }

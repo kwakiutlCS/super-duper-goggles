@@ -6,8 +6,6 @@ import javax.validation.constraints.Positive;
 
 public record TimeBound(@Positive long timestamp) implements GuaranteedBound {
 
-    public static final String BOUND_TYPE = "TIME_BOUND";
-
     @Override
     public Stream<Long> apply(Stream<Long> schedule) {
         return apply(schedule, 0);
@@ -26,10 +24,5 @@ public record TimeBound(@Positive long timestamp) implements GuaranteedBound {
     @Override
     public long getValue() {
         return timestamp;
-    }
-
-    @Override
-    public String getType() {
-        return BOUND_TYPE;
     }
 }

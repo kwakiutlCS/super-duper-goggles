@@ -6,8 +6,6 @@ import javax.validation.constraints.Positive;
 
 public record CountBound(@Positive long limit) implements GuaranteedBound {
 
-    public static final String BOUNT_TYPE = "COUNT_BOUND";
-
     @Override
     public Stream<Long> apply(Stream<Long> schedule) {
         return apply(schedule, 0L);
@@ -26,10 +24,5 @@ public record CountBound(@Positive long limit) implements GuaranteedBound {
     @Override
     public long getValue() {
         return limit;
-    }
-
-    @Override
-    public String getType() {
-        return BOUNT_TYPE;
     }
 }

@@ -43,8 +43,11 @@ class CompositeBoundTest {
     @Test
     void shouldNotCreateWithNoneCombined() {
         NoBound none = Bound.none();
+        CountBound count = Bound.count(1L);
+        Bound composite = Bound.composite(count, count);
         
         assertEquals(none, Bound.composite(none, none));
+        assertEquals(composite, composite.add(none));
     }
     
     @Test
@@ -74,5 +77,13 @@ class CompositeBoundTest {
         assertFalse(validator.validate(b1.add(b1)).isEmpty());
         assertFalse(validator.validate(b1.add(b2)).isEmpty());
         assertFalse(validator.validate(b2.add(b1)).isEmpty());
+    }
+    
+    @Test
+    void shouldNotAllowNullArguments() {
+        assertFalse(validator.validate(new CompositeBound(Bound.count(1l), null)).isEmpty());
+        assertFalse(validator.validate(new CompositeBound(null, Bound.count(1l))).isEmpty());
+        assertFalse(validator.validate(Bound.composite(Bound.count(1l), null)).isEmpty());
+        assertFalse(validator.validate(Bound.composite(null, Bound.count(1l))).isEmpty());
     }
 }

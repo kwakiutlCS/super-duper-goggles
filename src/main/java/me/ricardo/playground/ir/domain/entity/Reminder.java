@@ -31,7 +31,7 @@ public class Reminder {
     @Valid
     private final Time time;
     
-    public Reminder(Long id, String user, String content, Time time, Metadata metadata) {
+    private Reminder(Long id, String user, String content, Time time, Metadata metadata) {
         this.id = id;
         this.user = user;
         this.content = content;

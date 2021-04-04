@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
@@ -31,7 +32,7 @@ public class ReminderCrud {
     }
 
     @Transactional
-    public Reminder createReminder(@Valid Reminder reminder) {
+    public Reminder createReminder(@NotNull @Valid Reminder reminder) {
         ReminderEntity entity = ReminderAdapter.toStorage(reminder, Metadata.of(clock.instant().getEpochSecond()));
         reminderRepository.persist(entity);
 
@@ -52,7 +53,7 @@ public class ReminderCrud {
     }
 
     @Transactional
-    public Optional<Reminder> updateReminder(@Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
+    public Optional<Reminder> updateReminder(@NotNull @Valid @ConvertGroup(from=Default.class, to=ReminderUpdate.class) Reminder reminder) {
         return reminderRepository.findByIdOptional(reminder.getId())
                                  .filter(r -> r.userId.equals(reminder.getUser()))
                                  .map(e -> ReminderAdapter.toStorage(reminder,

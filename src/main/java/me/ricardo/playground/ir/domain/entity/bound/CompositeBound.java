@@ -3,8 +3,9 @@ package me.ricardo.playground.ir.domain.entity.bound;
 import java.util.stream.Stream;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-record CompositeBound(@Valid Bound left, @Valid Bound right) implements Bound {
+record CompositeBound(@NotNull @Valid Bound left, @NotNull @Valid Bound right) implements Bound {
 
     @Override
     public Stream<Long> apply(Stream<Long> schedule) {

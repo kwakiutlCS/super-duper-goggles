@@ -144,6 +144,12 @@ class ReminderCrudTest {
         }
         
         @Test
+        void shouldNotAllowNullReminder() throws NoSuchMethodException, SecurityException {
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("createReminder", Reminder.class), new Object[]{null}).isEmpty());
+        }
+        
+        @Test
         void shouldNotAllowIdInReminder() throws NoSuchMethodException, SecurityException {
             // data
             Reminder reminder = Reminder.Builder.start().withId(1L).withUser("user").build();
@@ -225,6 +231,12 @@ class ReminderCrudTest {
                         
             // verification
             assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{reminder}).isEmpty());
+        }
+        
+        @Test
+        void shouldNotAllowNullReminder() throws NoSuchMethodException, SecurityException {
+            // verification
+            assertFalse(validator.validateParameters(crud, ReminderCrud.class.getDeclaredMethod("updateReminder", Reminder.class), new Object[]{null}).isEmpty());
         }
         
         @Test
