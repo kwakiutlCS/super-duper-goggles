@@ -53,4 +53,9 @@ class TimeBoundTest {
         assertFalse(validator.validate(Bound.timestamp(0L)).isEmpty());
         assertFalse(validator.validate(Bound.timestamp(-1L)).isEmpty());
     }
+
+    @Test
+    void shouldNotAllowAddingNull() throws NoSuchMethodException, SecurityException {
+        assertFalse(validator.forExecutables().validateParameters(Bound.timestamp(2L), GuaranteedBound.class.getDeclaredMethod("add", Bound.class), new Object[] {null}).isEmpty());
+    }
 }

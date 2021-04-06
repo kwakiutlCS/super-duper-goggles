@@ -1,6 +1,7 @@
 package me.ricardo.playground.ir.storage.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -12,6 +13,12 @@ public class ReminderRepository implements PanacheRepository<ReminderEntity> {
 
     public List<ReminderEntity> findByUser(String user) {
         return list("from Reminder r left join fetch r.time t where r.userId=?1", user);
+    }
+    
+    public Optional<ReminderEntity> findByIdAndUser(long id, String user) {
+        List<ReminderEntity> result = list("from Reminder r left join fetch r.time t where r.id=?1 and r.userId=?2", id, user);
+        
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     public List<ReminderEntity> findAtTimestamp(long timestamp) {

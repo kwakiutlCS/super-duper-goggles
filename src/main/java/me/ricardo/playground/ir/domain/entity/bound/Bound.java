@@ -1,5 +1,6 @@
 package me.ricardo.playground.ir.domain.entity.bound;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
@@ -18,7 +19,9 @@ public sealed interface Bound permits AtomicBound, CompositeBound {
         return new CountBound(limit);
     }
     
-    static Bound composite(@NotNull Bound bound1, @NotNull Bound bound2) {
+    static Bound composite(Bound bound1, Bound bound2) {
+        Objects.requireNonNull(bound1);
+        Objects.requireNonNull(bound2);
         return bound1.add(bound2);
     }
 
@@ -28,7 +31,7 @@ public sealed interface Bound permits AtomicBound, CompositeBound {
     
     boolean isBounded();
 
-    Bound add(Bound other);
+    Bound add(@NotNull Bound other);
 
     boolean isAfter(long timestamp);
 }

@@ -83,7 +83,10 @@ class CompositeBoundTest {
     void shouldNotAllowNullArguments() {
         assertFalse(validator.validate(new CompositeBound(Bound.count(1l), null)).isEmpty());
         assertFalse(validator.validate(new CompositeBound(null, Bound.count(1l))).isEmpty());
-        assertFalse(validator.validate(Bound.composite(Bound.count(1l), null)).isEmpty());
-        assertFalse(validator.validate(Bound.composite(null, Bound.count(1l))).isEmpty());
+    }
+
+    @Test
+    void shouldNotAllowAddingNull() throws NoSuchMethodException, SecurityException {
+        assertFalse(validator.forExecutables().validateParameters(Bound.composite(Bound.count(1L), Bound.timestamp(1L)), CompositeBound.class.getDeclaredMethod("add", Bound.class), new Object[] {null}).isEmpty());
     }
 }

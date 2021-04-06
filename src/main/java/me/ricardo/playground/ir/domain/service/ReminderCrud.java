@@ -47,8 +47,7 @@ public class ReminderCrud {
     }
 
     public Optional<Reminder> getReminder(long id, String user) {
-        return reminderRepository.findByIdOptional(id)
-                                 .filter(r -> r.userId.equals(user))
+        return reminderRepository.findByIdAndUser(id, user)
                                  .map(ReminderAdapter::fromStorage);
     }
 
@@ -64,8 +63,7 @@ public class ReminderCrud {
 
     @Transactional
     public boolean deleteReminder(long id, String user) {
-        return reminderRepository.findByIdOptional(id)
-                                 .filter(r -> r.userId.equals(user))
+        return reminderRepository.findByIdAndUser(id, user)
                                  .map(r -> reminderRepository.deleteById(r.id))
                                  .orElse(false);
     }

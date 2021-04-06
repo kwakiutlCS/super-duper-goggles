@@ -23,12 +23,14 @@ public class ReminderRepositoryFake extends ReminderRepository {
         }
     }
     
+    @Override
     public List<ReminderEntity> findByUser(String user) {
         return reminders.values().stream()
                                  .filter(r -> user.equals(r.userId))
                                  .collect(Collectors.toList());
     }
     
+    @Override
     public void persist(ReminderEntity entity) {
         if (entity.id == null) {
             entity.id = next_id++;
@@ -37,14 +39,17 @@ public class ReminderRepositoryFake extends ReminderRepository {
         reminders.put(entity.id, entity);
     }
     
+    @Override
     public Optional<ReminderEntity> findByIdOptional(Long id) {
         return Optional.ofNullable(reminders.get(id));
     }
     
+    @Override
     public boolean deleteById(Long id) {
         return reminders.remove(id) != null;
     }
     
+    @Override
     public List<ReminderEntity> findAtTimestamp(long timestamp) {
         return reminders.values().stream()
                                  .filter(r -> r.time != null)
@@ -53,6 +58,7 @@ public class ReminderRepositoryFake extends ReminderRepository {
                                  .collect(Collectors.toList());
     }
     
+    @Override
     public List<ReminderEntity> findRecurrentAtCurrentSecond(long minute) {
         return reminders.values().stream()
                                  .filter(r -> r.time != null)
@@ -61,11 +67,17 @@ public class ReminderRepositoryFake extends ReminderRepository {
                                  .collect(Collectors.toList());
     }
     
+    @Override
+    public Optional<ReminderEntity> findByIdAndUser(long id, String user) {
+        return findByIdOptional(id).filter(r -> r.userId.equals(user));
+    }
+    
     public static ReminderRepository getNoDelete() {
         return new NoDeleteRepository();
     }
     
     static class NoDeleteRepository extends ReminderRepositoryFake {
+        @Override
         public boolean deleteById(Long id) {
             return false;
         }

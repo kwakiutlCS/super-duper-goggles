@@ -51,4 +51,9 @@ class CountBoundTest {
         assertFalse(validator.validate(Bound.count(0)).isEmpty());
         assertFalse(validator.validate(Bound.count(-1)).isEmpty());
     }
+    
+    @Test
+    void shouldNotAllowAddingNull() throws NoSuchMethodException, SecurityException {
+        assertFalse(validator.forExecutables().validateParameters(Bound.count(2L), GuaranteedBound.class.getDeclaredMethod("add", Bound.class), new Object[] {null}).isEmpty());
+    }
 }
