@@ -279,7 +279,7 @@ class ReminderServiceTest {
             assertEquals(reminder.id, result.getId());
             assertEquals(reminder.content, result.getContent());
             assertEquals(reminder.createdAt, result.getMetadata().createdAt());
-            assertEquals(BoundType.TIME_BOUND, reminder.time.boundType);
+            assertEquals(BoundType.TIME_BOUND, reminder.getTime().boundType);
             assertEquals(List.of(), result.getTime().schedule(timestamp, Bound.count(1)).collect(Collectors.toList()));
         }
         
@@ -292,7 +292,7 @@ class ReminderServiceTest {
             ReminderService svc = new ReminderService(repository, crud);
             
             // action
-            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp());
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.getTime().getTimestamp());
             
             // verification
             assertEquals(Optional.empty(), result);
@@ -333,7 +333,7 @@ class ReminderServiceTest {
             ReminderService svc = new ReminderService(new ReminderRepositoryFake(reminder), null);
             
             // action
-            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp() + 1);
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.getTime().getTimestamp() + 1);
             
             // verification
             assertEquals(Optional.of(ReminderAdapter.fromStorage(reminder)), result);
@@ -348,7 +348,7 @@ class ReminderServiceTest {
             ReminderService svc = new ReminderService(repository, crud);
             
             // action
-            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.time.getTimestamp());
+            Optional<Reminder> result = svc.truncate(reminder.id, "user", reminder.getTime().getTimestamp());
             
             // verification
             assertEquals(Optional.empty(), result);

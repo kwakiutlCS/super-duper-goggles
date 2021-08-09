@@ -5,7 +5,7 @@ reminder:
   created_at: 1000
   updated_at: 1000
 time:
-- id: "regex:\\d+"
+- reminder_id: "regex:\\d+"
   timestamp: 90060
   seconds_in_day: 3660
   unit: DAYS

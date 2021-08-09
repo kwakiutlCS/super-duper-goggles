@@ -2,7 +2,6 @@ package me.ricardo.playground.ir.domain.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,7 +15,6 @@ import me.ricardo.playground.ir.domain.entity.Reminder;
 import me.ricardo.playground.ir.domain.entity.bound.GuaranteedBound;
 import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
-import me.ricardo.playground.ir.domain.operator.Field;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
 import me.ricardo.playground.ir.storage.repository.ReminderRepository;
@@ -37,7 +35,7 @@ public class ReminderService {
     public List<Long> getSchedule(long id, String user, long start, @NotNull @Valid GuaranteedBound bound) {
         return reminderRepository.findByIdOptional(id)
                                  .filter(r -> r.userId.equals(user))
-                                 .map(e -> ReminderAdapter.fromStorage(e, Set.of(Field.EXCEPTIONS)))
+                                 .map(e -> ReminderAdapter.fromStorage(e))
                                  .map(Reminder::getTime)
                                  .map(t -> t.schedule(start, bound))
                                  .orElse(Stream.empty())
@@ -49,7 +47,7 @@ public class ReminderService {
     public boolean addException(long id, String user, long exception) {
         Optional<TimeEntity> entityOptional = reminderRepository.findByIdOptional(id)
                                                                 .filter(r -> r.userId.equals(user))
-                                                                .map(r -> r.time);
+                                                                .map(r -> r.getTime());
         
         if (entityOptional.isEmpty()) return false;
         
@@ -87,7 +85,7 @@ public class ReminderService {
             crud.deleteReminder(id, user);
         } else {
             reminder = Optional.of(Reminder.Builder.start(reminder.orElseThrow()).withTime(truncated).build());
-            ReminderAdapter.toStorage(truncated, reminderEntity.map(r -> r.time).orElseThrow());
+            ReminderAdapter.toStorage(truncated, reminderEntity.map(r -> r.getTime()).orElseThrow());
         }
         
         return reminder;

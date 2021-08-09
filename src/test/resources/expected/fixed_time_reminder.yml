@@ -5,5 +5,5 @@ reminder:
   created_at: 1000
   updated_at: 1000
 time:
-- id: 2
+- reminder_id: 1
   timestamp: 7200

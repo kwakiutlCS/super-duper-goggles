@@ -26,6 +26,6 @@ public class ReminderRepository implements PanacheRepository<ReminderEntity> {
     }
 
     public List<ReminderEntity> findRecurrentAtCurrentSecond(long seconds) {
-        return list("from Reminder r join fetch r.time t left join fetch t.exceptions e where t.secondsSinceStartDay=?1", seconds);
+        return list("from Reminder r join fetch r.time t where t.secondsSinceStartDay=?1", seconds);
     }
 }

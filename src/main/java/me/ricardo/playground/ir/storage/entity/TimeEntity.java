@@ -5,16 +5,16 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import me.ricardo.playground.ir.storage.converter.ExceptionsConverter;
 import me.ricardo.playground.ir.storage.converter.ZoneConverter;
 
 @Entity(name = "Time")
@@ -40,9 +40,12 @@ public class TimeEntity extends PanacheEntity {
     @Column(name = "bound_value")
     public Long boundValue;
     
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name="Exception")
+    @Convert(converter = ExceptionsConverter.class)
     public Set<Long> exceptions;
+    
+    @OneToOne
+    @MapsId
+    public ReminderEntity reminder;
 
     
     public long getTimestamp() {

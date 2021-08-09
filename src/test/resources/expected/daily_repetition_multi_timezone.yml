@@ -20,28 +20,28 @@ reminder:
   created_at: 1000
   updated_at: 1000
 time:
-- id: "regex:\\d+"
+- reminder_id: "regex:\\d+"
   timestamp: 1609504200
   seconds_in_day: 45000
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Lisbon"
-- id: "regex:\\d+"
+- reminder_id: "regex:\\d+"
   timestamp: 1625139000
   seconds_in_day: 45000
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Lisbon"
-- id: "regex:\\d+"
+- reminder_id: "regex:\\d+"
   timestamp: 1609500600
   seconds_in_day: 41400
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Berlin"
-- id: "regex:\\d+"
+- reminder_id: "regex:\\d+"
   timestamp: 1625135400
   seconds_in_day: 41400
   unit: DAYS

@@ -4,51 +4,47 @@ reminder:
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 2
-- id: 3
+- id: 2
   content: westeuropesummer
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 4
-- id: 5
+- id: 3
   content: centraleurope
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 6
-- id: 7
+- id: 4
   content: centraleuropesummer
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 8
 time:
-- id: 2
+- reminder_id: 1
   timestamp: 1609504200
   seconds_in_day: 45000
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Lisbon"
-- id: 4
-  timestamp: 1625139000
+- timestamp: 1625139000
   seconds_in_day: 45000
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Lisbon"
-- id: 6
-  timestamp: 1609500600
+  reminder_id: 2
+- timestamp: 1609500600
   seconds_in_day: 41400
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Berlin"
-- id: 8
-  timestamp: 1625135400
+  reminder_id: 3
+- timestamp: 1625135400
   seconds_in_day: 41400
   unit: DAYS
   step: 1
   bound_type: NO_BOUND
   zone: "Europe/Berlin"
+  reminder_id: 4

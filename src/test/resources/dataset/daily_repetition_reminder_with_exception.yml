@@ -4,28 +4,23 @@ reminder:
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 2
-- id: 3
+- id: 2
   content: content
   user_id: user
   created_at: 1000
   updated_at: 1000
-  time_id: 4
 time:
-- id: 2
+- reminder_id: 1
   timestamp: 3600 
   step: 1
   unit: DAYS
   bound_type: NO_BOUND
   zone: Z
-- id: 4
-  timestamp: 3600 
-  step: 1
-  unit: DAYS
-  bound_type: NO_BOUND
-  zone: Z
-exception:
-- time_id: 2
   exceptions: 90000
-- time_id: 4
+- reminder_id: 2
+  timestamp: 3600 
+  step: 1
+  unit: DAYS
+  bound_type: NO_BOUND
+  zone: Z
   exceptions: 90000

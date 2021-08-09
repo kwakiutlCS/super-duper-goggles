@@ -2,10 +2,7 @@ package me.ricardo.playground.ir.domain.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,8 +35,8 @@ class ReminderQuerierTest {
     void shouldBeAbleToFindRecurrentRemindersAfterDayLightSavingsChangePortugal() {
         // data
         ReminderEntity reminder = ReminderFakes.DAILY_REPETITION();
-        reminder.time.setTimestamp(1610000040L);
-        reminder.time.setZone(ZoneId.of("Europe/Lisbon"));
+        reminder.getTime().setTimestamp(1610000040L);
+        reminder.getTime().setZone(ZoneId.of("Europe/Lisbon"));
         ReminderQuerier querier = new ReminderQuerier(new ReminderRepositoryFake(reminder));
         
         // verification
@@ -53,8 +50,8 @@ class ReminderQuerierTest {
     void shouldBeAbleToFindRecurrentRemindersAfterDayLightSavingsChangeGermany() {
         // data
         ReminderEntity reminder = ReminderFakes.DAILY_REPETITION();
-        reminder.time.setTimestamp(1610000040L);
-        reminder.time.setZone(ZoneId.of("Europe/Berlin"));
+        reminder.getTime().setTimestamp(1610000040L);
+        reminder.getTime().setZone(ZoneId.of("Europe/Berlin"));
         ReminderQuerier querier = new ReminderQuerier(new ReminderRepositoryFake(reminder));
         
         // verification
@@ -68,13 +65,13 @@ class ReminderQuerierTest {
     void shouldBeAbleToFilterRemindersScheduleAtSameMinute() {
         // data
         ReminderEntity reminder1 = ReminderFakes.DAILY_REPETITION();
-        reminder1.time.setTimestamp(1610000040L);
-        reminder1.time.setZone(ZoneId.of("Europe/Lisbon"));
+        reminder1.getTime().setTimestamp(1610000040L);
+        reminder1.getTime().setZone(ZoneId.of("Europe/Lisbon"));
         
         ReminderEntity reminder2 = ReminderFakes.DAILY_REPETITION();
-        reminder2.time.setTimestamp(1610000040L);
-        reminder2.time.setZone(ZoneId.of("Europe/Lisbon"));
-        reminder2.time.step = Integer.MAX_VALUE;
+        reminder2.getTime().setTimestamp(1610000040L);
+        reminder2.getTime().setZone(ZoneId.of("Europe/Lisbon"));
+        reminder2.getTime().step = Integer.MAX_VALUE;
         ReminderQuerier querier = new ReminderQuerier(new ReminderRepositoryFake(reminder1, reminder2));
         
         // verification

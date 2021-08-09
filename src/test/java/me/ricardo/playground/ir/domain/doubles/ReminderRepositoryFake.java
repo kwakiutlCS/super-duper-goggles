@@ -1,6 +1,5 @@
 package me.ricardo.playground.ir.domain.doubles;
 
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -52,18 +51,18 @@ public class ReminderRepositoryFake extends ReminderRepository {
     @Override
     public List<ReminderEntity> findAtTimestamp(long timestamp) {
         return reminders.values().stream()
-                                 .filter(r -> r.time != null)
-                                 .filter(r -> r.time.getTimestamp() == timestamp)
-                                 .filter(r -> r.time.unit == null)
+                                 .filter(r -> r.getTime() != null)
+                                 .filter(r -> r.getTime().getTimestamp() == timestamp)
+                                 .filter(r -> r.getTime().unit == null)
                                  .collect(Collectors.toList());
     }
     
     @Override
     public List<ReminderEntity> findRecurrentAtCurrentSecond(long minute) {
         return reminders.values().stream()
-                                 .filter(r -> r.time != null)
-                                 .filter(r -> r.time.unit != null)
-                                 .filter(r -> r.time.getTimestamp() % 86400 == minute)
+                                 .filter(r -> r.getTime() != null)
+                                 .filter(r -> r.getTime().unit != null)
+                                 .filter(r -> r.getTime().getTimestamp() % 86400 == minute)
                                  .collect(Collectors.toList());
     }
     

@@ -29,7 +29,7 @@ public class ReminderFakes {
         reminder.userId = "user";
         reminder.createdAt = 0;
         reminder.updatedAt = 0;
-        reminder.time = timeEntity;
+        reminder.setTime(timeEntity);
         
         return reminder;
     }
@@ -48,21 +48,21 @@ public class ReminderFakes {
         reminder.userId = "user";
         reminder.createdAt = 0;
         reminder.updatedAt = 0;
-        reminder.time = timeEntity;
+        reminder.setTime(timeEntity);
         
         return reminder;
     }
     
     public static ReminderEntity DAILY_REPETITION_WITH_EXCEPTIONS() {
         ReminderEntity reminder = DAILY_REPETITION();
-        reminder.time.exceptions = Set.of(60L);
+        reminder.getTime().exceptions = Set.of(60L);
         
         return reminder;
     }
     
     public static ReminderEntity DAILY_REPETITION_RECENT() {
         ReminderEntity reminder = DAILY_REPETITION();
-        reminder.time.setTimestamp(1610000040L);
+        reminder.getTime().setTimestamp(1610000040L);
         
         return reminder;
     }

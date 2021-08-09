@@ -6,7 +6,7 @@ reminder:
   updated_at: 1000
   time_id: 2
 time:
-- id: 2
+- reminder_id: 1
   timestamp: 3600 
   step: 1
   unit: DAYS

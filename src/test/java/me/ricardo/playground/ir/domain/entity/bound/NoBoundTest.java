@@ -12,8 +12,6 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.junit.jupiter.api.Test;
 
-import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
-
 class NoBoundTest {
     
     private static final ExecutableValidator validator = Validation.buildDefaultValidatorFactory().getValidator().forExecutables();

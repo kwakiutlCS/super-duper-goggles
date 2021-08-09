@@ -21,6 +21,19 @@ public class ReminderEntity extends PanacheEntity {
     @Column(nullable = false, name = "updated_at")
     public long updatedAt;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    public TimeEntity time;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "reminder", orphanRemoval = true)
+    private TimeEntity time;
+    
+    public void setTime(TimeEntity time) {
+        if (time != null) {
+            time.reminder = this;
+            this.time = time;
+        } else {
+            this.time = null;
+        }
+    }
+    
+    public TimeEntity getTime() {
+        return time;
+    }
 }

@@ -79,8 +79,8 @@ class ReminderCrudTest {
         }
         
         @Test
-        void shouldNotRetrieveExceptionsForReminder() {
-            assertTrue(((DailyRepetition) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
+        void shouldRetrieveExceptionsForReminderEagerly() {
+            assertFalse(((DailyRepetition) crud.getReminder(4L, "user").get().getTime()).getExceptions().isEmpty());
         }
     }
 

@@ -1,7 +1,6 @@
 package me.ricardo.playground.ir.domain.adapter;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Set;
 
 import me.ricardo.playground.ir.domain.entity.Metadata;
 import me.ricardo.playground.ir.domain.entity.Reminder;
@@ -13,7 +12,6 @@ import me.ricardo.playground.ir.domain.entity.repetition.DailyRepetition;
 import me.ricardo.playground.ir.domain.entity.repetition.FixedTime;
 import me.ricardo.playground.ir.domain.entity.repetition.NoTime;
 import me.ricardo.playground.ir.domain.entity.repetition.Time;
-import me.ricardo.playground.ir.domain.operator.Field;
 import me.ricardo.playground.ir.storage.entity.BoundType;
 import me.ricardo.playground.ir.storage.entity.ReminderEntity;
 import me.ricardo.playground.ir.storage.entity.TimeEntity;
@@ -32,10 +30,10 @@ public class ReminderAdapter {
         entity.createdAt = metadata.createdAt();
         entity.updatedAt = metadata.updatedAt();
         
-        if (entity.time == null) {
-            entity.time = toStorage(reminder.getTime());
+        if (entity.getTime() == null) {
+            entity.setTime(toStorage(reminder.getTime()));
         } else {
-            entity.time = toStorage(reminder.getTime(), entity.time);
+            entity.setTime(toStorage(reminder.getTime(), entity.getTime()));
         }
         
         return entity;
@@ -76,24 +74,16 @@ public class ReminderAdapter {
     }
     
     public static Reminder fromStorage(ReminderEntity entity) {
-        return fromStorage(entity, Set.of());
-    }
-    
-    public static Reminder fromStorage(ReminderEntity entity, Set<Field> whitelist) {
         return Reminder.Builder.start()
                                .withContent(entity.content)
                                .withId(entity.id)
                                .withUser(entity.userId)
                                .withMetadata(Metadata.of(entity.createdAt, entity.updatedAt))
-                               .withTime(fromStorage(entity.time, whitelist))
+                               .withTime(fromStorage(entity.getTime()))
                                .build();
     }
 
     public static Time fromStorage(TimeEntity entity) {
-        return fromStorage(entity, Set.of());
-    }
-    
-    public static Time fromStorage(TimeEntity entity, Set<Field> whitelist) {
         if (entity == null) {
             return NoTime.INSTANCE;
         }
@@ -104,10 +94,7 @@ public class ReminderAdapter {
         
         AtomicBound bound = fromStorage(entity.boundType, entity.boundValue);
         
-        // optionally lazy load properties
-        Set<Long> exceptions = whitelist.contains(Field.EXCEPTIONS) ? entity.exceptions : Set.of();
-        
-        return new DailyRepetition(entity.getTimestamp(), entity.step, bound, entity.getZone(), exceptions);
+        return new DailyRepetition(entity.getTimestamp(), entity.step, bound, entity.getZone(), entity.exceptions);
     }
     
     private static AtomicBound fromStorage(BoundType bound, Long boundValue) {
